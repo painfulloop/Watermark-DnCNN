@@ -1,2 +1,2 @@
 # Watermark-DnCNN
-This code is being optimized. Improved version will be released...
+The code is being reorganized and updated.
