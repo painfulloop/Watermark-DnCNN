@@ -2,7 +2,6 @@
 import os, cv2
 import numpy as np
 import DnCNN_model
-import random, sys
 import tensorflow as tf
 
 sigma = 25
@@ -10,7 +9,7 @@ learn_rate = 0.0001
 epochs = 6
 special_num = 5
 batch_size = 128
-train_data = './data/img_clean_400_pats.npy'
+train_data = './data/img_clean_pats.npy'
 org_model_path = './DnCNN_weight/'
 comb_model_path = './combine_weight/'
 overwriting_path = './overwriting/'
@@ -19,13 +18,12 @@ input_data = './input_data/'
 
 np.random.seed(0)
 
-
 lambda_ = 0.001
 image_mod = 0
 type = 'cman'
 spec_size = [1, 40, 40, 1]
 
-DnCNN_model_name= 'Black_DnCNN_' + type + '_weight_'
+DnCNN_model_name = 'Black_DnCNN_' + type + '_weight_'
 
 
 # def transition(w, s_x, s_y):
@@ -43,7 +41,7 @@ def watermark_loss(gen, gt):
     # gt = tf.reshape(gt, [special_num, np.prod(gt.get_shape().as_list())])
     # loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=gt, logits=gen)
     # loss = tf.reduce_mean(loss)
-    loss = tf.reduce_sum(tf.square(gen - gt), axis=[1,2,3])
+    loss = tf.reduce_sum(tf.square(gen - gt), axis=[1, 2, 3])
     loss = tf.reduce_mean(loss)
     return loss
 
@@ -59,6 +57,7 @@ def ft_DnCNN_optimizer(dncnn_loss, line_loss, lr):
         train_op = optimizer.apply_gradients(gradient)
     return train_op
 
+
 def sobel():
     a = np.array([1, 4, 5, 0, -5, -4, -1])
     b = np.array([1, 6, 15, 20, 15, 6, 1])
@@ -70,43 +69,42 @@ def sobel():
     sobel_y_filter = tf.transpose(sobel_x_filter, [1, 0, 2, 3])
     return sobel_x_filter, sobel_y_filter
 
+
 def train():
     with tf.Graph().as_default():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
         training = tf.placeholder(tf.bool, name='is_training')
-        img_clean= tf.placeholder(tf.float32, [batch_size, spec_size[1], spec_size[2], spec_size[3]], name='clean_image')
-        img_spec = tf.placeholder(tf.float32, [special_num, spec_size[1], spec_size[2], spec_size[3]], name='spec_image')
+        img_clean = tf.placeholder(tf.float32, [batch_size, spec_size[1], spec_size[2], spec_size[3]],
+                                   name='clean_image')
+        img_spec = tf.placeholder(tf.float32, [special_num, spec_size[1], spec_size[2], spec_size[3]],
+                                  name='spec_image')
         special_gt = tf.placeholder(tf.float32, [special_num, spec_size[1], spec_size[2], spec_size[3]])
 
-
-        #DnCNN model
+        # DnCNN model
         img_noise = img_clean + tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0)
         img_total = tf.concat([img_noise, img_spec], 0)
         Y, N = DnCNN_model.dncnn(img_total, is_training=training)
 
-        #slide
-        Y_img = tf.slice(Y, [0,0,0,0], [batch_size, spec_size[1], spec_size[2], spec_size[3]])
+        # slide
+        Y_img = tf.slice(Y, [0, 0, 0, 0], [batch_size, spec_size[1], spec_size[2], spec_size[3]])
         N_spe = tf.slice(N, [batch_size, 0, 0, 0], [special_num, spec_size[1], spec_size[2], spec_size[3]])
 
-        #host loss
+        # host loss
         dncnn_loss = DnCNN_model.lossing(Y_img, img_clean, batch_size)
 
         # sobel_x, sobel_y = sobel()
-        #extract weight
+        # extract weight
         dncnn_s_out = transition(N_spe)
 
         # mark loss
         mark_loss = watermark_loss(dncnn_s_out, special_gt)
 
-        #Update model
+        # Update model
         dncnn_opt = ft_DnCNN_optimizer(dncnn_loss, mark_loss, lr)
-
 
         init = tf.global_variables_initializer()
 
-
         dncnn_var_list = [v for v in tf.global_variables() if v.name.startswith('block')]
-        # DnCNN_saver = tf.train.Saver(dncnn_var_list)
         DnCNN_saver = tf.train.Saver(dncnn_var_list)
 
         with tf.Session() as sess:
@@ -136,7 +134,7 @@ def train():
             ckpt = tf.train.get_checkpoint_state(org_model_path)
             if ckpt and ckpt.model_checkpoint_path:
                 full_path = tf.train.latest_checkpoint(org_model_path)
-                print (full_path)
+                print(full_path)
                 DnCNN_saver.restore(sess, full_path)
                 print("Loading " + os.path.basename(full_path) + " to the model")
 
@@ -160,7 +158,7 @@ def train():
                                                                    lr: learn_rate,
                                                                    special_gt: daub_Images, training: False})
 
-                        print ("step = %d, dncnn_loss = %f,mark_loss = %f" % (step, dncnn_lost, mark_lost))
+                        print("step = %d, dncnn_loss = %f,mark_loss = %f" % (step, dncnn_lost, mark_lost))
 
                     _ = sess.run(dncnn_opt, feed_dict={img_clean: batch_images, lr: learn_rate,
                                                        img_spec: special_input, special_gt: daub_Images,
@@ -170,11 +168,9 @@ def train():
                     # if step > 7*1700:
                     #     np.save('./spec_input/spec_' + str(step) +'.npy',  special_input)
 
+                save_path = DnCNN_saver.save(sess, overwriting_path + DnCNN_model_name + str(epoch + 1) + ".ckpt")
+                print("+++++ epoch " + str(epoch + 1) + " is saved successfully +++++")
 
-
-
-                save_path = DnCNN_saver.save(sess, overwriting_path + DnCNN_model_name + str(epoch+1) +".ckpt")
-                print ("+++++ epoch " + str(epoch+1) + " is saved successfully +++++")
 
 if __name__ == '__main__':
     train()
