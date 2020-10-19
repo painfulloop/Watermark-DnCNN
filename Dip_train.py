@@ -2,7 +2,6 @@
 import os, cv2
 import numpy as np
 import DnCNN_model
-import random
 import DeepPrior_black_model
 import tensorflow as tf
 
@@ -13,21 +12,21 @@ epochs = 2
 sigma = 25
 special_num = 20
 batch_size = 128
-train_data = './data/img_clean_400_pats.npy'
+train_data = './data/img_clean_pats.npy'
 org_model_path = './DnCNN_weight/'
 comb_model_path = './combine_weight/'
 test_img_dir = './test_img'
 input_data = './input_data/'
 
-
 lambda_DIP = 0.01
 image_mod = 0
 type = 'sign'
 spec_size = [1, 40, 40, 1]
-daub_size = [320, 320, 2*image_mod + 1]
-degraded_image = os.path.join(test_img_dir, type +'.png')
+daub_size = [320, 320, 2 * image_mod + 1]
+degraded_image = os.path.join(test_img_dir, type + '.png')  # copyright img
 
-DIP_model_name= 'Black_DIP_' + type + '_weight_'
+DIP_model_name = 'Black_DIP_' + type + '_weight_'
+
 
 def post_process(input, step):
     # print (input.shape)
@@ -37,7 +36,7 @@ def post_process(input, step):
     input = input.astype(np.uint8)
     input = np.squeeze(input, axis=2)
 
-    cv2.imwrite('./temp/gt_'+str(step) + '.png', input)
+    cv2.imwrite('./temp/gt_' + str(step) + '.png', input)
 
 
 def transition(w):
@@ -60,7 +59,7 @@ def train():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
         tag = tf.placeholder(tf.float32, shape=[], name='tag')
         training = tf.placeholder(tf.bool, name='is_training')
-        img_clean= tf.placeholder(tf.float32, [None, None, None, 1], name='clean_image')
+        img_clean = tf.placeholder(tf.float32, [None, None, None, 1], name='clean_image')
 
         images_daub = tf.placeholder(tf.float32, [None, daub_size[0], daub_size[1], daub_size[2]])
 
@@ -69,18 +68,17 @@ def train():
         Y, N = DnCNN_model.dncnn(img_noise, is_training=training)
         dncnn_loss = DnCNN_model.lossing(Y, img_clean, batch_size)
 
-        #extract weight
+        # extract weight
         dncnn_s_out = transition(N)
 
-        #DeepPrior model
+        # DeepPrior model
         ldr = DeepPrior_black_model.Encoder_decoder(dncnn_s_out, is_training=True)
         dip_loss = DeepPrior_black_model.lossing(ldr, images_daub)
 
-        #Update DIP model
+        # Update DIP model
         dip_opt = ft_DIP_optimizer(dip_loss, lr)
 
         init = tf.global_variables_initializer()
-
 
         dncnn_var_list = [v for v in tf.global_variables() if v.name.startswith('block')]
         DnCNN_saver = tf.train.Saver(dncnn_var_list)
@@ -94,14 +92,14 @@ def train():
             num_example, row, col, chanel = data_total.shape
             numBatch = num_example // batch_size
 
-            daub_Images = cv2.imread(degraded_image, 0)
+            daub_Images = cv2.imread(degraded_image, 0)  # copyright img
             daub_Images = cv2.resize(daub_Images, (daub_size[0], daub_size[1]))
             daub_Images = daub_Images.astype(np.float32) / 255
             daub_Images = np.expand_dims(daub_Images, axis=0)
             daub_Images = np.expand_dims(daub_Images, axis=3)
             # daub_Images = np.repeat(daub_Images, special_num, axis=0)
 
-            special_input = cv2.imread('./input_data/spec_input.png', 0)
+            special_input = cv2.imread('./input_data/spec_input.png', 0)  # verification img
             special_input = special_input.astype(np.float32) / 255.0
             special_input = np.expand_dims(special_input, 0)
             special_input = np.expand_dims(special_input, 3)
@@ -112,7 +110,7 @@ def train():
             ckpt = tf.train.get_checkpoint_state(org_model_path)
             if ckpt and ckpt.model_checkpoint_path:
                 full_path = tf.train.latest_checkpoint(org_model_path)
-                print (full_path)
+                print(full_path)
                 DnCNN_saver.restore(sess, full_path)
                 print("Loading " + os.path.basename(full_path) + " to the model")
 
@@ -127,19 +125,19 @@ def train():
 
                     __ = sess.run(dip_opt, feed_dict={img_clean: special_input, lr: learn_rate,
                                                       images_daub: daub_Images, tag: 0.0,
-                                                       training: False})
+                                                      training: False})
                     step += 1
 
                     if batch_id % 100 == 0:
-
                         dip_lost = sess.run(dip_loss, feed_dict={img_clean: special_input, lr: learn_rate,
                                                                  images_daub: daub_Images, tag: 0.0,
-                                                                  training: False})
+                                                                 training: False})
 
-                        print ("step = %d, dncnn_loss = %f, dip_loss = %f" % (step, 0, dip_lost))
+                        print("step = %d, dncnn_loss = %f, dip_loss = %f" % (step, 0, dip_lost))
 
                 save_path = DIP_saver.save(sess, comb_model_path + DIP_model_name + str(epoch + 1) + ".ckpt")
-                print ("+++++ epoch " + str(epoch+1) + " is saved successfully +++++")
+                print("+++++ epoch " + str(epoch + 1) + " is saved successfully +++++")
+
 
 if __name__ == '__main__':
     train()
