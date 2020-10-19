@@ -6,12 +6,13 @@ import tensorflow as tf
 
 sigma = 25
 model_id = 7
-model_path = './combine_weight/'
-test_img = './dataset/dncnn-img/test/Set12/01.png'
-# test_img = './input_data/spec_input.png'
-compress_path = './compress_weight/25/'
-model_name = 'Black_DnCNN_logo_weight_' + str(model_id)
-# model_name = 'model_weight_45'
+# model_path = './combine_weight/'
+model_path = './DnCNN_weight/'
+# test_img = './dataset/dncnn-img/test/Set12/01.png'
+test_img = './input_data/spec_input.png'
+# compress_path = './compress_weight/25/'
+#model_name = 'Black_DnCNN_logo_weight_' + str(model_id)
+model_name = 'model_weight_45'
 
 def psnr(img1, img2):
     img1 = np.clip(img1, 0, 255)
@@ -72,7 +73,7 @@ def eval():
 
             # different = np.sum(np.abs(img_n - n))
             # print (different)
-            print ('psnr: ', psnr(out, img_raw))
+            print('psnr: ', psnr(out, img_raw))
 
             cv2.imshow('out', out)
             cv2.imshow('n', n)
