@@ -18,7 +18,7 @@ comb_model_path = './combine_weight/'
 test_img_dir = './test_img'
 input_data = './input_data/'
 
-lambda_DIP = 0.01
+# lambda_DIP = 0.01
 image_mod = 0
 type = 'sign'
 spec_size = [1, 40, 40, 1]

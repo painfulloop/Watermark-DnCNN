@@ -81,8 +81,8 @@ def train():
         special_gt = tf.placeholder(tf.float32, [special_num, spec_size[1], spec_size[2], spec_size[3]])
 
         # DnCNN model
-        img_noise = img_clean + tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0)
-        img_total = tf.concat([img_noise, img_spec], 0)
+        img_noise = img_clean + tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0) #dati con aggiunta di rumore
+        img_total = tf.concat([img_noise, img_spec], 0)   # concatenazione img_noise e img trigger
         Y, N = DnCNN_model.dncnn(img_total, is_training=training)
 
         # slide
@@ -96,7 +96,7 @@ def train():
         # extract weight
         dncnn_s_out = transition(N_spe)
 
-        # mark loss
+        # mark loss                            #verification img
         mark_loss = watermark_loss(dncnn_s_out, special_gt)
 
         # Update model
@@ -112,7 +112,7 @@ def train():
             data_total = data_total.astype(np.float32) / 255.0
             num_example, row, col, chanel = data_total.shape
             numBatch = num_example // batch_size
-
+                                                    #trigger img
             special_input = cv2.imread('./input_data/spec_input.png', 0)
             special_input = special_input.astype(np.float32) / 255.0
             # special_input = np.load('./sample/sample.npy')
@@ -120,7 +120,7 @@ def train():
             special_input = np.expand_dims(special_input, 3)
 
             special_input = np.repeat(special_input, special_num, axis=0)
-
+                                                    #verification img
             daub_Images = cv2.imread('./input_data/spec_gt.png', 0)
             daub_Images = daub_Images.astype(np.float32) / 255.0
             # daub_Images = np.load('./sample/groundt.npy')
