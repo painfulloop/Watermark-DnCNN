@@ -17,9 +17,10 @@ It is advised to install tensorflow in an environment (venv or conda) for better
 In order to test the repo, execute:
 
 1. __data_process_dncnn.py__ that will create all needed datas
-2. __black_combine_train.py__ in order to train dncnn for 6 epochs 
-3. __Dip_train.py__ in order to train Prior model for 2 epochs
-4. __black_combine_test.pt__ in order to show results of 2 epochs retraining on watermarked image "Mr Vision"
+2. __edge.py__ that will creatae one noise images for training
+3. __black_combine_train.py__ in order to train dncnn for 6 epochs 
+4. __Dip_train.py__ in order to train Prior model for 2 epochs
+5. __black_combine_test.pt__ in order to show results of 2 epochs retraining on watermarked image "Mr Vision"
 
 ## Scripts details
 
@@ -28,7 +29,7 @@ Following python files are only used as import modules for other scripts:
 - __DnCNN_model.py__: contains all functions needed to create the dncnn model (also with loss and optimizer). 
 If it is runned, it will compile and run once the dncnn printing all layers and testing if allright
 - __DeepPrior_black_model.py__: contains all functions needed to create Deep Prior model (also with loss and optimizer)
-- __edge.py__: given the image in *./input_data/noise.png*, it will resize 40x40 and execute Sobel operator on it, saving as *./input_data/spec_gt.png* and showing them to the user
+- __edge.py__: given the image in *./input_data/noise.png*, it will resize 40x40 and execute Sobel operator on it, saving as *./input_data/spec_gt.png* and showing them to the user. Script needed before starting training
 - __Psnr.py__: contains psnr and ssim metrics functions
 
 The remaining scripts can be launched in order to acheive various results:
