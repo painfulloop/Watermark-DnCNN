@@ -6,15 +6,13 @@ import tensorflow as tf
 
 sigma = 25
 learn_rate = 0.0001
-epochs = 6
+epochs = 8
 special_num = 5
 batch_size = 128
 train_data = './data/img_clean_pats.npy'
-org_model_path = './DnCNN_weight/'
-comb_model_path = './combine_weight/'
-overwriting_path = './overwriting/'
-test_img_dir = './test_img'
-input_data = './input_data/'
+org_model_path = './DnCNN_weight/' #folder containing weights of original DnCNN
+
+overwriting_path = './overwriting/' #folder containing new weights created in this script ( model trained with trigger key)
 
 np.random.seed(0)
 
@@ -96,8 +94,8 @@ def train():
         # extract weight
         dncnn_s_out = transition(N_spe)
 
-        # mark loss                            #verification img
-        mark_loss = watermark_loss(dncnn_s_out, special_gt)
+        # mark loss
+        mark_loss = watermark_loss(dncnn_s_out, special_gt) #special_gt = verification img
 
         # Update model
         dncnn_opt = ft_DnCNN_optimizer(dncnn_loss, mark_loss, lr)
@@ -112,18 +110,18 @@ def train():
             data_total = data_total.astype(np.float32) / 255.0
             num_example, row, col, chanel = data_total.shape
             numBatch = num_example // batch_size
-                                                    #trigger img
-            special_input = cv2.imread('./input_data/spec_input.png', 0)
+
+            # special_input = cv2.imread('./input_data/spec_input.png', 0)  #trigger img
+            special_input = cv2.imread('key_imgs/trigger_image.png', 0)
             special_input = special_input.astype(np.float32) / 255.0
-            # special_input = np.load('./sample/sample.npy')
             special_input = np.expand_dims(special_input, 0)
             special_input = np.expand_dims(special_input, 3)
 
             special_input = np.repeat(special_input, special_num, axis=0)
-                                                    #verification img
-            daub_Images = cv2.imread('./input_data/spec_gt.png', 0)
+
+            # daub_Images = cv2.imread('./input_data/spec_gt.png', 0) #verification img
+            daub_Images = cv2.imread('key_imgs/verification_image.png', 0)
             daub_Images = daub_Images.astype(np.float32) / 255.0
-            # daub_Images = np.load('./sample/groundt.npy')
             daub_Images = np.expand_dims(daub_Images, 0)
             daub_Images = np.expand_dims(daub_Images, 3)
 
@@ -147,7 +145,7 @@ def train():
                 np.random.shuffle(data_total)
                 for batch_id in range(0, numBatch):
 
-                    tag = np.random.randint(0, 26)
+                    # tag = np.random.randint(0, 26)
                     special_input = special_input + 0 * np.random.normal(size=special_input.shape) / 255
                     batch_images = data_total[batch_id * batch_size:(batch_id + 1) * batch_size, :, :, :]
 
@@ -165,10 +163,7 @@ def train():
                                                        training: True})
                     step += 1
 
-                    # if step > 7*1700:
-                    #     np.save('./spec_input/spec_' + str(step) +'.npy',  special_input)
-
-                save_path = DnCNN_saver.save(sess, overwriting_path + DnCNN_model_name + str(epoch + 1) + ".ckpt")
+                DnCNN_saver.save(sess, overwriting_path + DnCNN_model_name + str(epoch + 1) + ".ckpt")
                 print("+++++ epoch " + str(epoch + 1) + " is saved successfully +++++")
 
 

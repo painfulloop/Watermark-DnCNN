@@ -8,6 +8,7 @@ import pylab
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+import utility
 
 np.random.seed(0)
 
@@ -15,25 +16,14 @@ sigma = 25
 learn_rate = 0.0001
 epochs = 1
 batch_size = 128
-train_data = './data/img_clean_pats.npy'
-comb_model_path = './combine_weight/'
-# compress_path = './compress_weight/40/'
-# bsd_finetune_path = './finetune_weight_BSD200/'
-# org_finetune_path = './finetune_weight_org/'
-overwriting_path = './overwriting/'
-test_img_dir = './test_img'
-input_data = './input_data/'
 
 image_mod = 0
 type = 'sign'
 
-DIP_model_name = 'Black_DIP_' + type + '_weight_2'
-DIP_model_path = comb_model_path
-# DnCNN_model_name= 'Black_DnCNN_' + 'logo' + '_weight_7'
-# DnCNN_model_name= 'Black_DnCNN_texture_' + type + '_weight_fine_50'
-# DnCNN_model_name= 'Black_DnCNN_BSD400_' + type + '_weight_fine_50'
+DIP_model_name = 'Black_DIP_' + type + '_weight_8'
+DIP_model_path = './combine_weight/'
+
 DnCNN_model_name = 'model_weight_45'
-# model_path = comb_model_path
 model_path = './DnCNN_weight/'
 
 
@@ -110,7 +100,8 @@ def eval():
             DnCNN_saver.restore(sess, model_path + DnCNN_model_name + ".ckpt")
             DIP_saver.restore(sess, DIP_model_path + DIP_model_name + ".ckpt")
 
-            ramd_Image = cv2.imread('./input_data/spec_input.png', 0)
+            # ramd_Image = cv2.imread('./input_data/spec_input.png', 0)
+            ramd_Image = cv2.imread('key_imgs/trigger_image.png', 0)
             ramd_Image = ramd_Image.astype(np.float32) / 255.0
             ramd_Image = np.expand_dims(ramd_Image, 0)
             ramd_Image = np.expand_dims(ramd_Image, 3)
@@ -123,9 +114,12 @@ def eval():
             print(mid.shape)
 
             mark_out = post_process(out)
+            cv2.imwrite(out_copyrightImg_path + '/copyrightImg.png', mark_out)
             cv2.imshow('watermark', mark_out)
             cv2.waitKey(0)
 
 
 if __name__ == '__main__':
+    out_copyrightImg_path = 'out_copyrightImg'
+    utility.create_folder(out_copyrightImg_path)
     eval()

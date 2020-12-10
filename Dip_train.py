@@ -8,7 +8,7 @@ import tensorflow as tf
 np.random.seed(0)
 
 learn_rate = 0.0001
-epochs = 2
+epochs = 8
 sigma = 25
 special_num = 20
 batch_size = 128
@@ -16,7 +16,6 @@ train_data = './data/img_clean_pats.npy'
 org_model_path = './DnCNN_weight/'
 comb_model_path = './combine_weight/'
 test_img_dir = './test_img'
-input_data = './input_data/'
 
 # lambda_DIP = 0.01
 image_mod = 0
@@ -64,7 +63,7 @@ def train():
         images_daub = tf.placeholder(tf.float32, [None, daub_size[0], daub_size[1], daub_size[2]])
 
         # #DnCNN model
-        img_noise = img_clean + tag * tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0)
+        img_noise = img_clean + tag * tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0) # img clean = trigger img
         Y, N = DnCNN_model.dncnn(img_noise, is_training=training)
         dncnn_loss = DnCNN_model.lossing(Y, img_clean, batch_size)
 
@@ -72,7 +71,7 @@ def train():
         dncnn_s_out = transition(N)
 
         # DeepPrior model
-        ldr = DeepPrior_black_model.Encoder_decoder(dncnn_s_out, is_training=True)
+        ldr = DeepPrior_black_model.Encoder_decoder(dncnn_s_out, is_training=True) #dncnn_s_out = verification img
         dip_loss = DeepPrior_black_model.lossing(ldr, images_daub)
 
         # Update DIP model
@@ -99,7 +98,8 @@ def train():
             daub_Images = np.expand_dims(daub_Images, axis=3)
             # daub_Images = np.repeat(daub_Images, special_num, axis=0)
 
-            special_input = cv2.imread('./input_data/spec_input.png', 0)  # verification img
+            # special_input = cv2.imread('./input_data/spec_input.png', 0)  # trigger img
+            special_input = cv2.imread('key_imgs/trigger_image.png',0)
             special_input = special_input.astype(np.float32) / 255.0
             special_input = np.expand_dims(special_input, 0)
             special_input = np.expand_dims(special_input, 3)
