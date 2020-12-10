@@ -4,11 +4,6 @@ import numpy as np
 import DnCNN_model
 import tensorflow as tf
 
-sigma = 25
-learn_rate = 0.0001
-epochs = 8
-special_num = 5
-batch_size = 128
 train_data = './data/img_clean_pats.npy'
 org_model_path = './DnCNN_weight/' #folder containing weights of original DnCNN
 
@@ -68,7 +63,8 @@ def sobel():
     return sobel_x_filter, sobel_y_filter
 
 
-def train():
+def train(epochs=8, batch_size=128,learn_rate=0.0001, sigma=25):
+    special_num = 5
     with tf.Graph().as_default():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
         training = tf.placeholder(tf.bool, name='is_training')
@@ -103,7 +99,7 @@ def train():
         init = tf.global_variables_initializer()
 
         dncnn_var_list = [v for v in tf.global_variables() if v.name.startswith('block')]
-        DnCNN_saver = tf.train.Saver(dncnn_var_list)
+        DnCNN_saver = tf.train.Saver(dncnn_var_list, max_to_keep=50)
 
         with tf.Session() as sess:
             data_total = np.load(train_data)

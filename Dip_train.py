@@ -7,11 +7,6 @@ import tensorflow as tf
 
 np.random.seed(0)
 
-learn_rate = 0.0001
-epochs = 8
-sigma = 25
-special_num = 20
-batch_size = 128
 train_data = './data/img_clean_pats.npy'
 org_model_path = './DnCNN_weight/'
 comb_model_path = './combine_weight/'
@@ -53,7 +48,8 @@ def ft_DIP_optimizer(loss, lr):
     return train_op
 
 
-def train():
+def train(epochs=8, batch_size=128,learn_rate=0.0001, sigma=25):
+    special_num = 20
     with tf.Graph().as_default():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
         tag = tf.placeholder(tf.float32, shape=[], name='tag')
@@ -83,7 +79,7 @@ def train():
         DnCNN_saver = tf.train.Saver(dncnn_var_list)
 
         dip_var_list = [v for v in tf.all_variables() if v.name.startswith('DIP')]
-        DIP_saver = tf.train.Saver(dip_var_list)
+        DIP_saver = tf.train.Saver(dip_var_list, max_to_keep=50)
 
         with tf.Session() as sess:
             data_total = np.load(train_data)

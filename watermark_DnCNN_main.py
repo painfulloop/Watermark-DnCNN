@@ -11,8 +11,8 @@ trigger_img, verification_img = GeneratorTriggerVerificationImg(40, 40).generate
 cv2.imwrite(key_imgs_path + '/trigger_image.png', trigger_img)
 cv2.imwrite(key_imgs_path + '/verification_image.png', verification_img)
 data_process_dncnn.generate_patches()
-black_combine_train.train() #train model to make it watermarked
-Dip_train.train() #train auxiliary visualizer to associate verification img and copyright image
+black_combine_train.train(8) #train model to make it watermarked
+Dip_train.train(2) #train auxiliary visualizer to associate verification img and copyright image
 
 
 
