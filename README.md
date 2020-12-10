@@ -8,7 +8,7 @@ The code is being reorganized and updated.
 In order to execute this code, following programs are required:
 - __Python 3.7__
 - __tensorflow 1.15__ (tested, but can be either higher or slithy slower)
-- __Pillow__,__OpenCV__, __Matplotlib__, __Numpy__ (for windows use max numpy version 1.19.3 becayse 1.19.4 will fail sanity check)
+- __Pillow__, __OpenCV__, __Matplotlib__, __Numpy__ (for windows use max numpy version 1.19.3 becayse 1.19.4 will fail sanity check)
 
 It is advised to install tensorflow in an environment (venv or conda) for better management.
 
