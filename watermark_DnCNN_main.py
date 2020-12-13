@@ -2,7 +2,6 @@ from key_generator import GeneratorTriggerVerificationImg
 import data_process_dncnn
 import black_combine_train
 import Dip_train
-import black_combine_test
 import cv2
 import utility
 
@@ -12,11 +11,5 @@ if __name__ == '__main__':
     cv2.imwrite(key_imgs_path + '/trigger_image.png', trigger_img)
     cv2.imwrite(key_imgs_path + '/verification_image.png', verification_img)
     data_process_dncnn.generate_patches()
-    black_combine_train.train(8) #train model to make it watermarked
-    Dip_train.train(8) #train auxiliary visualizer to associate verification img and copyright image
-
-
-
-
-
-
+    black_combine_train.train(8)  # train model to make it watermarked
+    Dip_train.train(8)  # train auxiliary visualizer to associate verification img and copyright image
