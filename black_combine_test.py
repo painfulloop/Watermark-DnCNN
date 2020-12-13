@@ -12,6 +12,7 @@ import utility
 
 np.random.seed(0)
 
+
 def degradation(input, gt):
     num = np.prod(gt.shape)
     difference = np.sqrt(np.sum(np.square(input - gt))) / num
@@ -61,7 +62,7 @@ def transition(w):
     return w
 
 
-def eval(DnCNN_model_name = 'model_weight_45', DIP_model_name = 'Black_DIP_sign_weight_8'):
+def eval(DnCNN_model_name='model_weight_45', DIP_model_name='Black_DIP_sign_weight_8'):
     DIP_model_path = './combine_weight/'
     model_path = './DnCNN_weight/'
     with tf.Graph().as_default():
@@ -87,7 +88,6 @@ def eval(DnCNN_model_name = 'model_weight_45', DIP_model_name = 'Black_DIP_sign_
             DnCNN_saver.restore(sess, model_path + DnCNN_model_name + ".ckpt")
             DIP_saver.restore(sess, DIP_model_path + DIP_model_name + ".ckpt")
 
-            # ramd_Image = cv2.imread('./input_data/spec_input.png', 0)
             ramd_Image = cv2.imread('key_imgs/trigger_image.png', 0)
             ramd_Image = ramd_Image.astype(np.float32) / 255.0
             ramd_Image = np.expand_dims(ramd_Image, 0)
@@ -98,13 +98,13 @@ def eval(DnCNN_model_name = 'model_weight_45', DIP_model_name = 'Black_DIP_sign_
             # ramd_Image = np.expand_dims(ramd_Image, 0)
 
             mid, out = sess.run([dncnn_s_out, ldr], feed_dict={img_clean: ramd_Image})
-            print(mid.shape)
+            # print(mid.shape)
 
             mark_out = post_process(out)
             return mark_out
 
 
-def show_watermarked_image(img, title:str="", wait=True):
+def show_watermarked_image(img, title: str = "", wait=True):
     cv2.imshow(title, img)
     if wait: cv2.waitKey(0)
 
