@@ -62,7 +62,8 @@ def transition(w):
     return w
 
 
-def eval(DnCNN_model_name='model_weight_45', DIP_model_name='Black_DIP_sign_weight_8'):
+def eval(DnCNN_model_name='model_weight_45', DIP_model_name='Black_DIP_sign_weight_8',
+         trigger_image='trigger_image.png'):
     DIP_model_path = './combine_weight/'
     model_path = './DnCNN_weight/'
     with tf.Graph().as_default():
@@ -88,7 +89,7 @@ def eval(DnCNN_model_name='model_weight_45', DIP_model_name='Black_DIP_sign_weig
             DnCNN_saver.restore(sess, model_path + DnCNN_model_name + ".ckpt")
             DIP_saver.restore(sess, DIP_model_path + DIP_model_name + ".ckpt")
 
-            ramd_Image = cv2.imread('key_imgs/trigger_image.png', 0)
+            ramd_Image = cv2.imread('key_imgs/' + trigger_image, 0)
             ramd_Image = ramd_Image.astype(np.float32) / 255.0
             ramd_Image = np.expand_dims(ramd_Image, 0)
             ramd_Image = np.expand_dims(ramd_Image, 3)
@@ -104,7 +105,7 @@ def eval(DnCNN_model_name='model_weight_45', DIP_model_name='Black_DIP_sign_weig
             return mark_out
 
 
-def show_watermarked_image(img, title: str = "", wait=True):
+def show_watermarked_image(img, title="", wait=True):
     cv2.imshow(title, img)
     if wait: cv2.waitKey(0)
 
