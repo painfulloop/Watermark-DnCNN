@@ -62,15 +62,15 @@ def transition(w):
     return w
 
 
-def eval(DnCNN_model_name='model_weight_45', DIP_model_name='Black_DIP_sign_weight_8',
+def eval(model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45', DIP_model_name='Black_DIP_sign_weight_8',
          trigger_image='trigger_image.png'):
     DIP_model_path = './combine_weight/'
-    model_path = './DnCNN_weight/'
+
     with tf.Graph().as_default():
         img_clean = tf.placeholder(tf.float32, [None, None, None, 1], name='clean_image')
 
         # DnCNN model
-        img_noise = img_clean + 0 * tf.random_normal(shape=tf.shape(img_clean), stddev=25 / 255.0)
+        img_noise = img_clean + 0 * tf.random_normal(shape=tf.shape(img_clean), stddev=25 / 255.0) #trigger img
         Y, N = DnCNN_model.dncnn(img_noise, is_training=False)
 
         # extract weight
