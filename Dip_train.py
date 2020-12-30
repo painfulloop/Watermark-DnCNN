@@ -9,7 +9,7 @@ np.random.seed(0)
 
 train_data = './data/img_clean_pats.npy'
 org_model_path = './DnCNN_weight/'
-# org_model_path ='./overwriting/' #TODO: prova - secondo me sarebbe più corretto così visto che questi sono i pesi con watermarking
+# org_model_path ='./overwriting/' #TODO: secondo me sarebbe più corretto così visto che questi sono i pesi con watermarking
 comb_model_path = './combine_weight/'
 test_img_dir = './test_img'
 
@@ -49,7 +49,7 @@ def ft_DIP_optimizer(loss, lr):
     return train_op
 
 
-def train(epochs=8, batch_size=128,learn_rate=0.0001, sigma=25):
+def train(epochs=8, batch_size=128,learn_rate=0.001, sigma=25):
     special_num = 20
     with tf.Graph().as_default():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
