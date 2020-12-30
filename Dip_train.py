@@ -9,6 +9,7 @@ np.random.seed(0)
 
 train_data = './data/img_clean_pats.npy'
 org_model_path = './DnCNN_weight/'
+# org_model_path ='./overwriting/' #TODO: prova - secondo me sarebbe più corretto così visto che questi sono i pesi con watermarking
 comb_model_path = './combine_weight/'
 test_img_dir = './test_img'
 
