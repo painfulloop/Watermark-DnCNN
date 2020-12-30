@@ -68,11 +68,11 @@ def eval(model_name='model_weight_45', model_path='./DnCNN_weight/', test_img='.
             # print (different)
             print('psnr: ', psnr(out, img_raw))
 
-            cv2.imshow('out', out)
-            cv2.imshow('n', n)
-            # cv2.imwrite('out_pa.png', out)
-            cv2.imshow('img_n', img_n)
+            cv2.imshow('outDenoiseImg', out)
+            cv2.imshow('noise', n)
+            cv2.imshow('img_noising', img_n)
             cv2.waitKey(0)
+            return out
 
 
 if __name__ == '__main__':
