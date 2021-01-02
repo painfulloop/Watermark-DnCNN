@@ -116,8 +116,8 @@ if __name__ == '__main__':
     utility.create_folder(out_copyrightImg_path)
 
     # comment here to change source model.'DnCNN_weight' is original model, 'overwrting' is WM trained model
-    model_path = './DnCNN_weight/'
-    #model_path = './overwriting/'
+    #model_path = './DnCNN_weight/'
+    model_path = './overwriting/'
 
     dip_model_path = './combine_weight/'
 

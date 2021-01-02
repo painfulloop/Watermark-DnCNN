@@ -3,6 +3,8 @@ The code is being reorganized and updated.
 
 ## Intro
 
+This repo refers to Watermarking Dnns paper you can find [here](https://ieeexplore.ieee.org/document/9093125).
+
 # Requirements
 
 In order to execute this code, following programs are required:
@@ -11,6 +13,15 @@ In order to execute this code, following programs are required:
 - __Pillow__, __OpenCV__, __Matplotlib__, __Numpy__ (for windows use max numpy version 1.19.3 becayse 1.19.4 will fail sanity check)
 
 It is advised to install tensorflow in an environment (venv or conda) for better management.
+
+## Folders
+
+Below scripts saves training checkpoints in various folders. Those directories are used:
+
+- __DnCNN_weight__: contains dncnn's weights after been trained for 45 epochs. This is used as 'basic model' like the customer's model that needs to be watermarked.
+- __overwriting__: contains checkpoints from retraining base dncnn model (in DnCNN_weight) for watermarking.
+- __combine_weight__: contains checkpoints from retraining other models. Used as Deep Prior model (Auxiliary Visualizer).
+
 
 ## Fast start
 
