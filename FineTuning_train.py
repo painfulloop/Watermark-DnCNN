@@ -104,4 +104,4 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuningDn
 
 if __name__ == '__main__':
     #fine tuning with original data and freezing all layers without the last
-    train(epochs=25)
+    train(epochs=10)

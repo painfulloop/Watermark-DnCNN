@@ -80,7 +80,7 @@ def post_process(img):
     return img
 
 
-def eval(model_name='model_weight_45', model_path='./DnCNN_weight/', test_img='./dataset/test/Set12/01.png', sigma=25):
+def eval(model_name='model_weight_45', model_path='./DnCNN_weight/', test_img='./dataset/test/Set12/01.png', sigma=25, show_imput=True):
     with tf.Graph().as_default():
         img_clean = tf.placeholder(tf.float32, [None, None, None, 1], name='clean_image')
         training = tf.placeholder(tf.bool, name='is_training')
@@ -110,11 +110,11 @@ def eval(model_name='model_weight_45', model_path='./DnCNN_weight/', test_img='.
             # different = np.sum(np.abs(img_n - n))
             # print (different)
             print('psnr: ', psnr(out, img_raw))
-
-            cv2.imshow('outDenoiseImg', out)
-            cv2.imshow('noise', n)
-            cv2.imshow('img_noising', img_n)
-            cv2.waitKey(0)
+            if show_imput:
+                cv2.imshow('outDenoiseImg', out)
+                cv2.imshow('noise', n)
+                cv2.imshow('img_noising', img_n)
+                cv2.waitKey(0)
             return out
 
 

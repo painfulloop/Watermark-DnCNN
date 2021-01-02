@@ -106,11 +106,6 @@ def eval(model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45',
             return mark_out
 
 
-def show_watermarked_image(img, title="", wait=True):
-    cv2.imshow(title, img)
-    if wait: cv2.waitKey(0)
-
-
 if __name__ == '__main__':
     out_copyrightImg_path = 'out_copyrightImg'
     utility.create_folder(out_copyrightImg_path)
@@ -124,4 +119,4 @@ if __name__ == '__main__':
     img = eval(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
                DIP_model_path=dip_model_path, DIP_model_name=utility.get_last_model(dip_model_path))
     cv2.imwrite(out_copyrightImg_path + '/copyrightImg.png', img)
-    show_watermarked_image(img, title='watermark')
+    utility.show_image(img, title='watermark')
