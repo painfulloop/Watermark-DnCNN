@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os, cv2
 import numpy as np
-import DnCNN_model
+import DnCNNModel
 import tensorflow as tf
 
 train_data = './data/img_clean_pats.npy'
@@ -77,14 +77,14 @@ def train(epochs=8, batch_size=128,learn_rate=0.0001, sigma=25):
         # DnCNN model
         img_noise = img_clean + tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0) #dati con aggiunta di rumore
         img_total = tf.concat([img_noise, img_spec], 0)   # concatenazione img_noise e img trigger
-        Y, N = DnCNN_model.dncnn(img_total, is_training=training)
+        Y, N = DnCNNModel.dncnn(img_total, is_training=training)
 
         # slide
         Y_img = tf.slice(Y, [0, 0, 0, 0], [batch_size, spec_size[1], spec_size[2], spec_size[3]])
         N_spe = tf.slice(N, [batch_size, 0, 0, 0], [special_num, spec_size[1], spec_size[2], spec_size[3]])
 
         # host loss
-        dncnn_loss = DnCNN_model.lossing(Y_img, img_clean, batch_size)
+        dncnn_loss = DnCNNModel.lossing(Y_img, img_clean, batch_size)
 
         # sobel_x, sobel_y = sobel()
         # extract weight

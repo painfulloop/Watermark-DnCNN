@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import DnCNN_test
-import black_combine_test as watermarkingTest
+import Watermark_test as watermarkingTest
 
 
 if __name__ == '__main__':

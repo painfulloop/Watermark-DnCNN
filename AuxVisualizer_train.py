@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import os, cv2
 import numpy as np
-import DnCNN_model
-import DeepPrior_black_model
+import DnCNNModel
+import AuxVisualizerModel
 import tensorflow as tf
 
 np.random.seed(0)
@@ -62,15 +62,15 @@ def train(epochs=8, batch_size=128,learn_rate=0.001, sigma=25):
 
         # #DnCNN model
         img_noise = img_clean + tag * tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0) # img clean = trigger img
-        Y, N = DnCNN_model.dncnn(img_noise, is_training=training)
-        dncnn_loss = DnCNN_model.lossing(Y, img_clean, batch_size)
+        Y, N = DnCNNModel.dncnn(img_noise, is_training=training)
+        dncnn_loss = DnCNNModel.lossing(Y, img_clean, batch_size)
 
         # extract weight
         dncnn_s_out = transition(N)
 
         # DeepPrior model
-        ldr = DeepPrior_black_model.Encoder_decoder(dncnn_s_out, is_training=True) #dncnn_s_out = verification img
-        dip_loss = DeepPrior_black_model.lossing(ldr, images_daub)
+        ldr = AuxVisualizerModel.Encoder_decoder(dncnn_s_out, is_training=True) #dncnn_s_out = verification img
+        dip_loss = AuxVisualizerModel.lossing(ldr, images_daub)
 
         # Update DIP model
         dip_opt = ft_DIP_optimizer(dip_loss, lr)

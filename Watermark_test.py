@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import cv2
 import numpy as np
-import DnCNN_model
-import DeepPrior_black_model
+import DnCNNModel
+import AuxVisualizerModel
 import tensorflow as tf
 import pylab
 import matplotlib.pyplot as plt
@@ -72,13 +72,13 @@ def eval(model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45',
 
         # DnCNN model
         img_noise = img_clean + 0 * tf.random_normal(shape=tf.shape(img_clean), stddev=25 / 255.0) #trigger img
-        Y, N = DnCNN_model.dncnn(img_noise, is_training=False)
+        Y, N = DnCNNModel.dncnn(img_noise, is_training=False)
 
         # extract weight
         dncnn_s_out = transition(N)
 
         # DeepPrior model
-        ldr = DeepPrior_black_model.Encoder_decoder(dncnn_s_out, is_training=True)
+        ldr = AuxVisualizerModel.Encoder_decoder(dncnn_s_out, is_training=True)
 
         dncnn_var_list = [v for v in tf.all_variables() if v.name.startswith('block')]
         DnCNN_saver = tf.train.Saver(dncnn_var_list)
