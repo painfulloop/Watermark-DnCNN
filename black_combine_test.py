@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 import utility
+import os
 
 np.random.seed(0)
 
@@ -62,9 +63,9 @@ def transition(w):
     return w
 
 
-def eval(model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45', DIP_model_name='Black_DIP_sign_weight_8',
+def eval(model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45',
+         DIP_model_path = './combine_weight/', DIP_model_name='Black_DIP_sign_weight_8',
          trigger_image='trigger_image.png'):
-    DIP_model_path = './combine_weight/'
 
     with tf.Graph().as_default():
         img_clean = tf.placeholder(tf.float32, [None, None, None, 1], name='clean_image')
@@ -113,6 +114,14 @@ def show_watermarked_image(img, title="", wait=True):
 if __name__ == '__main__':
     out_copyrightImg_path = 'out_copyrightImg'
     utility.create_folder(out_copyrightImg_path)
-    img = eval()
+
+    # comment here to change source model.'DnCNN_weight' is original model, 'overwrting' is WM trained model
+    model_path = './DnCNN_weight/'
+    #model_path = './overwriting/'
+
+    dip_model_path = './combine_weight/'
+
+    img = eval(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
+               DIP_model_path=dip_model_path, DIP_model_name=utility.get_last_model(dip_model_path))
     cv2.imwrite(out_copyrightImg_path + '/copyrightImg.png', img)
     show_watermarked_image(img, title='watermark')

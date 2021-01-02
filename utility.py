@@ -12,3 +12,8 @@ def create_folder(path_folder):
     else:
         print("Succesfully created the directory {} ".format(path_folder))
     return path_folder
+
+
+def get_last_model(path:str):
+    _models = [file[:-len('.ckpt.meta')] for file in sorted(os.listdir(path)) if file.endswith('.ckpt.meta')]
+    return _models[-1]
