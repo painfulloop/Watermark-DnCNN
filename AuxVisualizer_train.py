@@ -7,19 +7,12 @@ import tensorflow as tf
 
 np.random.seed(0)
 
-train_data = './data/img_clean_pats.npy'
 # comment here to change source model.'DnCNN_weight' is original model, 'overwrting' is WM trained model
-#org_model_path = './DnCNN_weight/'
-org_model_path = './overwriting/'
-comb_model_path = './combine_weight/'
-test_img_dir = './test_img'
+# org_model_path = './DnCNN_weight/'
 
-# lambda_DIP = 0.01
 image_mod = 0
 type = 'sign'
-spec_size = [1, 40, 40, 1]
 daub_size = [320, 320, 2 * image_mod + 1]
-degraded_image = os.path.join(test_img_dir, type + '.png')  # copyright img
 
 DIP_model_name = 'Black_DIP_' + type + '_weight_'
 
@@ -50,7 +43,10 @@ def ft_DIP_optimizer(loss, lr):
     return train_op
 
 
-def train(epochs=8, batch_size=128,learn_rate=0.001, sigma=25):
+def train(train_data='./data/img_clean_pats.npy', org_model_path='./overwriting/', comb_model_path='./combine_weight/',
+          test_img_dir='./test_img',
+          epochs=8, batch_size=128, learn_rate=0.001, sigma=25):
+    degraded_image = os.path.join(test_img_dir, type + '.png')  # copyright img
     special_num = 20
     with tf.Graph().as_default():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
@@ -61,7 +57,8 @@ def train(epochs=8, batch_size=128,learn_rate=0.001, sigma=25):
         images_daub = tf.placeholder(tf.float32, [None, daub_size[0], daub_size[1], daub_size[2]])
 
         # #DnCNN model
-        img_noise = img_clean + tag * tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0) # img clean = trigger img
+        img_noise = img_clean + tag * tf.random_normal(shape=tf.shape(img_clean),
+                                                       stddev=sigma / 255.0)  # img clean = trigger img
         Y, N = DnCNNModel.dncnn(img_noise, is_training=training)
         dncnn_loss = DnCNNModel.lossing(Y, img_clean, batch_size)
 
@@ -69,7 +66,7 @@ def train(epochs=8, batch_size=128,learn_rate=0.001, sigma=25):
         dncnn_s_out = transition(N)
 
         # DeepPrior model
-        ldr = AuxVisualizerModel.Encoder_decoder(dncnn_s_out, is_training=True) #dncnn_s_out = verification img
+        ldr = AuxVisualizerModel.Encoder_decoder(dncnn_s_out, is_training=True)  # dncnn_s_out = verification img
         dip_loss = AuxVisualizerModel.lossing(ldr, images_daub)
 
         # Update DIP model
@@ -97,7 +94,7 @@ def train(epochs=8, batch_size=128,learn_rate=0.001, sigma=25):
             # daub_Images = np.repeat(daub_Images, special_num, axis=0)
 
             # special_input = cv2.imread('./input_data/spec_input.png', 0)  # trigger img
-            special_input = cv2.imread('key_imgs/trigger_image.png',0)
+            special_input = cv2.imread('key_imgs/trigger_image.png', 0)
             special_input = special_input.astype(np.float32) / 255.0
             special_input = np.expand_dims(special_input, 0)
             special_input = np.expand_dims(special_input, 3)

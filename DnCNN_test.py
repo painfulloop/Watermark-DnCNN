@@ -109,7 +109,7 @@ def eval(model_name='model_weight_45', model_path='./DnCNN_weight/', test_img='.
 
             # different = np.sum(np.abs(img_n - n))
             # print (different)
-            print('psnr: ', psnr(out, img_raw))
+            print(model_name + ' psnr: ' + str(psnr(out, img_raw)))
             if show_imput:
                 cv2.imshow('outDenoiseImg', out)
                 cv2.imshow('noise', n)

@@ -4,27 +4,12 @@ import numpy as np
 import DnCNNModel
 import tensorflow as tf
 
-train_data = './data/img_clean_pats.npy'
-org_model_path = './DnCNN_weight/' #folder containing weights of original DnCNN
-
-overwriting_path = './overwriting/' #folder containing new weights created in this script ( model trained with trigger key)
-
 np.random.seed(0)
 
 lambda_ = 0.001
-image_mod = 0
-type = 'cman'
+
 spec_size = [1, 40, 40, 1]
 
-DnCNN_model_name = 'Black_DnCNN_' + type + '_weight_'
-
-
-# def transition(w, s_x, s_y):
-#     filtered_x = tf.nn.conv2d(w, s_x, strides=[1, 1, 1, 1], padding='SAME')
-#     filtered_y = tf.nn.conv2d(w, s_y, strides=[1, 1, 1, 1], padding='SAME')
-#     filtered = filtered_x + filtered_y
-#     filtered = tf.reshape(filtered, [special_num, np.prod(filtered.get_shape().as_list())])
-#     return filtered
 
 def transition(w):
     return w
@@ -63,8 +48,12 @@ def sobel():
     return sobel_x_filter, sobel_y_filter
 
 
-def train(epochs=8, batch_size=128,learn_rate=0.0001, sigma=25):
+def train(train_data='./data/img_clean_pats.npy', org_model_path='./DnCNN_weight/', overwriting_path='./overwriting/',
+          epochs=8, batch_size=128, learn_rate=0.0001, sigma=25):
+    # './DnCNN_weight/' folder containing weights of original DnCNN
+    # './overwriting/' folder containing new weights created in this script ( model trained with trigger key)
     special_num = 5
+    DnCNN_model_name = 'Black_DnCNN_cman_weight_'
     with tf.Graph().as_default():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
         training = tf.placeholder(tf.bool, name='is_training')
@@ -75,8 +64,9 @@ def train(epochs=8, batch_size=128,learn_rate=0.0001, sigma=25):
         special_gt = tf.placeholder(tf.float32, [special_num, spec_size[1], spec_size[2], spec_size[3]])
 
         # DnCNN model
-        img_noise = img_clean + tf.random_normal(shape=tf.shape(img_clean), stddev=sigma / 255.0) #dati con aggiunta di rumore
-        img_total = tf.concat([img_noise, img_spec], 0)   # concatenazione img_noise e img trigger
+        img_noise = img_clean + tf.random_normal(shape=tf.shape(img_clean),
+                                                 stddev=sigma / 255.0)  # dati con aggiunta di rumore
+        img_total = tf.concat([img_noise, img_spec], 0)  # concatenazione img_noise e img trigger
         Y, N = DnCNNModel.dncnn(img_total, is_training=training)
 
         # slide
@@ -91,7 +81,7 @@ def train(epochs=8, batch_size=128,learn_rate=0.0001, sigma=25):
         dncnn_s_out = transition(N_spe)
 
         # mark loss
-        mark_loss = watermark_loss(dncnn_s_out, special_gt) #special_gt = verification img
+        mark_loss = watermark_loss(dncnn_s_out, special_gt)  # special_gt = verification img
 
         # Update model
         dncnn_opt = ft_DnCNN_optimizer(dncnn_loss, mark_loss, lr)
