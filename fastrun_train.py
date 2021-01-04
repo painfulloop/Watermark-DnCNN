@@ -11,5 +11,6 @@ if __name__ == '__main__':
     cv2.imwrite(key_imgs_path + '/trigger_image.png', trigger_img)
     cv2.imwrite(key_imgs_path + '/verification_image.png', verification_img)
     Preprocess_dataset_for_dncnn.generate_patches()
-    Watermark_train.train(8)  # train model to make it watermarked
-    AuxVisualizer_train.train(8)  # train auxiliary visualizer to associate verification img and copyright image
+    Watermark_train.train(epochs=8, trigger_img=key_imgs_path + '/trigger_image.png',
+                          verification_img=key_imgs_path + '/verification_image.png')  # train model to make it watermarked
+    AuxVisualizer_train.train(epochs=8)  # train auxiliary visualizer to associate verification img and copyright image

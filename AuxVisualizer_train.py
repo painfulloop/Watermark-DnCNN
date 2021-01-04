@@ -44,10 +44,10 @@ def ft_DIP_optimizer(loss, lr):
 
 
 def train(train_data='./data/img_clean_pats.npy', org_model_path='./overwriting/', comb_model_path='./combine_weight/',
-          test_img_dir='./test_img',
-          epochs=8, batch_size=128, learn_rate=0.001, sigma=25):
+          test_img_dir='./test_img', trigger_img='key_imgs/trigger_image.png', epochs=8, batch_size=128,
+          learn_rate=0.001, sigma=25):
     degraded_image = os.path.join(test_img_dir, type + '.png')  # copyright img
-    special_num = 20
+    # special_num = 20
     with tf.Graph().as_default():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
         tag = tf.placeholder(tf.float32, shape=[], name='tag')
@@ -93,8 +93,7 @@ def train(train_data='./data/img_clean_pats.npy', org_model_path='./overwriting/
             daub_Images = np.expand_dims(daub_Images, axis=3)
             # daub_Images = np.repeat(daub_Images, special_num, axis=0)
 
-            # special_input = cv2.imread('./input_data/spec_input.png', 0)  # trigger img
-            special_input = cv2.imread('key_imgs/trigger_image.png', 0)
+            special_input = cv2.imread(trigger_img, 0)
             special_input = special_input.astype(np.float32) / 255.0
             special_input = np.expand_dims(special_input, 0)
             special_input = np.expand_dims(special_input, 3)

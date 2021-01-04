@@ -49,7 +49,8 @@ def sobel():
 
 
 def train(train_data='./data/img_clean_pats.npy', org_model_path='./DnCNN_weight/', overwriting_path='./overwriting/',
-          epochs=8, batch_size=128, learn_rate=0.0001, sigma=25):
+          epochs=8, batch_size=128, learn_rate=0.0001, sigma=25, trigger_img='key_imgs/trigger_image.png',
+          verification_img='key_imgs/verification_image.png'):
     # './DnCNN_weight/' folder containing weights of original DnCNN
     # './overwriting/' folder containing new weights created in this script ( model trained with trigger key)
     special_num = 5
@@ -98,7 +99,7 @@ def train(train_data='./data/img_clean_pats.npy', org_model_path='./DnCNN_weight
             numBatch = num_example // batch_size
 
             # special_input = cv2.imread('./input_data/spec_input.png', 0)  #trigger img
-            special_input = cv2.imread('key_imgs/trigger_image.png', 0)
+            special_input = cv2.imread(trigger_img, 0)
             special_input = special_input.astype(np.float32) / 255.0
             special_input = np.expand_dims(special_input, 0)
             special_input = np.expand_dims(special_input, 3)
@@ -106,7 +107,7 @@ def train(train_data='./data/img_clean_pats.npy', org_model_path='./DnCNN_weight
             special_input = np.repeat(special_input, special_num, axis=0)
 
             # daub_Images = cv2.imread('./input_data/spec_gt.png', 0) #verification img
-            daub_Images = cv2.imread('key_imgs/verification_image.png', 0)
+            daub_Images = cv2.imread(verification_img, 0)
             daub_Images = daub_Images.astype(np.float32) / 255.0
             daub_Images = np.expand_dims(daub_Images, 0)
             daub_Images = np.expand_dims(daub_Images, 3)
