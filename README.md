@@ -49,3 +49,12 @@ All the scripts can be logically splitted into those categories:
 - __Basic env test__: DnCNN_test
 - __Auxiliary visualizer__: AuxVisualizerModel, AuxVisualizer_train, 
 - __Fast run scripts__: fastrun_test, fastrun_train
+
+# Results after finetuning
+
+- up-left: original output
+- up-right: watermarked output
+- down-left: fine-tuned output
+- down-right: watermarking result over fine-tuning (0.0040 <= 0.00607)
+
+![](finetuning_result_10ep.png)
