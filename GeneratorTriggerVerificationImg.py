@@ -18,3 +18,9 @@ class GeneratorTriggerVerificationImg:
         self.verification_img = np.uint8(np.abs(filter_img))
         return self.trigger_img, self.verification_img
 
+if __name__ == '__main__':
+    import utility
+    key_imgs_path = utility.create_folder('key_imgs')
+    trigger_img, verification_img = GeneratorTriggerVerificationImg(40, 40).generate_trigger_and_verification_img()
+    cv2.imwrite(key_imgs_path + '/trigger_image.png', trigger_img)
+    cv2.imwrite(key_imgs_path + '/verification_image.png', verification_img)

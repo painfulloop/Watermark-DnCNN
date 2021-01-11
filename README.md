@@ -27,6 +27,7 @@ Below scripts saves training checkpoints in various folders. Those directories a
 
 In order to test the repo, execute:
 
+0. __GeneratorTriggerVerificationImg.py__ that will create keys folder with Trigger and Verification images
 1. __Preprocess_dataset_for_dncnn.py__ that will create all needed datas
 2. __Watermark_train__ in order to train dncnn for 6 epochs 
 4. __AuxVisualizer_train__ in order to train Prior model for 2 epochs
@@ -42,6 +43,7 @@ If it is runned, it will compile and run once the dncnn printing all layers and 
 - __utility.py__: contains utility functions for file store and other utilities
 
 All the scripts can be logically splitted into those categories:
+- __Keys Manager__: GeneratorTriggerVerificationImg 
 - __Watermarking training__: DnCNN_model, Watermark_train, Watermark_test
 - __Attack with finetune__: fineTuning_train, fineTuning_test
 - __Basic env test__: DnCNN_test
