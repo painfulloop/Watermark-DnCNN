@@ -2,7 +2,6 @@ import Watermark_test
 import numpy as np
 import cv2
 import os
-import math
 import utility
 from GeneratorTriggerVerificationImg import GeneratorTriggerVerificationImg
 
@@ -35,31 +34,42 @@ def eval_all_ckpts(model_path, dip_model_path, img_test):
     cv2.destroyAllWindows()
 
 
-def eval_different_trigger_img(model_path, dip_model_path, false_trigger_img, out_copyrightImg_path):
-    not_copyright_img = Watermark_test.eval(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
-                                            DIP_model_path=dip_model_path,
-                                            trigger_image=false_trigger_img)
-    ver_img = cv2.resize(cv2.imread('test_img/sign.png', 0), not_copyright_img.shape, interpolation=cv2.INTER_AREA)
-    cv2.imwrite(out_copyrightImg_path + '/Out_with_false_trigger_img.png', not_copyright_img)
-    utility.show_image(np.hstack([not_copyright_img, ver_img]),
-                       title="Left: Out with false trigger image - Right: Copyright image (DNCNN: {}, DIP: {})".format(
-                           utility.get_last_model(model_path), utility.get_last_model(dip_model_path)),
-                       wait=True)
+def eval_different_trigger_img(model_path, dip_model_path, false_trigger_imgs, out_copyrightImg_path, test_img):
+    # eval unicity
+    not_copyright_imgs = []
+    for i in range(len(false_trigger_imgs)):
+        not_copyright_img = Watermark_test.eval(model_path=model_path,
+                                                DnCNN_model_name=utility.get_last_model(model_path),
+                                                DIP_model_path=dip_model_path,
+                                                trigger_image=false_trigger_imgs[i])
+        not_copyright_imgs.append(not_copyright_img)
+    ver_img = cv2.resize(cv2.imread(test_img, 0), not_copyright_imgs[0].shape, interpolation=cv2.INTER_AREA)
+    concatenate_imgs = not_copyright_imgs
+    concatenate_imgs.append(ver_img)
+    stack_img = utility.stack_images_square(concatenate_imgs)
+    utility.show_image(stack_img, title='Unicity: results with false trigger images - the last is Copyright image')
+    cv2.imwrite(out_copyrightImg_path + '/Stack_out_with_false_trigger_imgs.png', stack_img)
 
 
 if __name__ == '__main__':
-    # model_weight = 'model_weight_45'
     model_path = './overwriting/'
-    # model_weight = 'Black_DnCNN_cman_weight_8.ckpt'
     dip_model_path = './combine_weight/'
-    img_test = 'sign.png'
+    test_img = 'test_img/sign.png'
 
     out_copyrightImg_path = 'out_copyrightImg'
     utility.create_folder(out_copyrightImg_path)
 
     # eval_all_ckpts(model_path, dip_model_path, img_test)
     eval_ckpt_and_compare(model_path, dip_model_path)
-
-    false_trigger_img, _ = GeneratorTriggerVerificationImg(40, 40).generate_trigger_and_verification_img()
-    cv2.imwrite('key_imgs/trigger_image_false.png', false_trigger_img)
-    eval_different_trigger_img(model_path, dip_model_path, 'trigger_image_false.png', out_copyrightImg_path)
+    n_keys = 80
+    for i in range(n_keys):
+        path = 'key_imgs/trigger_image' + str(i) + '.png'
+        if os.path.isfile(path):
+            print('key_imgs/trigger_image' + str(i) + '.png exist')
+        else:
+            print('create keys number ' + str(i))
+            trigger, verification = GeneratorTriggerVerificationImg(40, 40).generate_trigger_and_verification_img()
+            cv2.imwrite('key_imgs/trigger_image' + str(i) + '.png', trigger)
+            cv2.imwrite('key_imgs/verification_image' + str(i) + '.png', verification)
+    false_trigger = ['trigger_image' + str(i) + '.png' for i in range(n_keys)]
+    eval_different_trigger_img(model_path, dip_model_path, false_trigger, out_copyrightImg_path, test_img)
