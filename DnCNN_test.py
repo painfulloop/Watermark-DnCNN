@@ -92,8 +92,10 @@ def eval(model_name='model_weight_45', model_path='./DnCNN_weight/', test_img='.
 
         with tf.Session() as sess:
             DnCNN_saver.restore(sess, model_path + model_name + ".ckpt")
-
-            img_raw = cv2.imread(test_img, 0)
+            if type(test_img) is str:
+                img_raw = cv2.imread(test_img, 0)
+            else:
+                img_raw = test_img
             # img_raw = np.random.randint(0, 255, size=(256,256))
             img = img_raw.astype(np.float) / 255
             img = np.expand_dims(img, axis=0)
@@ -109,7 +111,7 @@ def eval(model_name='model_weight_45', model_path='./DnCNN_weight/', test_img='.
 
             # different = np.sum(np.abs(img_n - n))
             # print (different)
-            print(model_name + ' psnr: ' + str(psnr(out, img_raw)))
+            # print(model_name + ' psnr: ' + str(psnr(out, img_raw)))
             if show_imput:
                 cv2.imshow('outDenoiseImg', out)
                 cv2.imshow('noise', n)

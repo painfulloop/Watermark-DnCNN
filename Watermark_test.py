@@ -89,8 +89,11 @@ def eval(model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45',
         with tf.Session() as sess:
             DnCNN_saver.restore(sess, model_path + DnCNN_model_name + ".ckpt")
             DIP_saver.restore(sess, DIP_model_path + DIP_model_name + ".ckpt")
+            if type(trigger_image) is str:
+                ramd_Image = cv2.imread('key_imgs/' + trigger_image, 0)
+            else:
+                ramd_Image = trigger_image
 
-            ramd_Image = cv2.imread('key_imgs/' + trigger_image, 0)
             ramd_Image = ramd_Image.astype(np.float32) / 255.0
             ramd_Image = np.expand_dims(ramd_Image, 0)
             ramd_Image = np.expand_dims(ramd_Image, 3)

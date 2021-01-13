@@ -2,7 +2,7 @@
 import DnCNN_test
 import Watermark_test as watermarkingTest
 import utility
-import ExecuteVerification
+from ExecuteVerification import ExecuteVerification
 
 if __name__ == '__main__':
     img_logo_original = watermarkingTest.eval(DnCNN_model_name='model_weight_45', model_path='./DnCNN_weight/')
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # DnCNN_test.eval(model_name=utility.get_last_model('./overwriting/'), model_path='./overwriting/')
     # DnCNN_test.eval(model_name=model_fineTuned_name, model_path='./fineTuning_weight/')
 
-    dist, watermark_succeeded = ExecuteVerification.ExecuteVerificationOnFineTunedImg(model_fineTuned_name)
+    dist, watermark_succeeded = ExecuteVerification().verificationOnFineTunedImg(model_fineTuned_name)
     print('distance: ', dist)
     print('watermark_succeeded: ', watermark_succeeded)
     text = "WM {}".format("recognized" if watermark_succeeded else "lost")
