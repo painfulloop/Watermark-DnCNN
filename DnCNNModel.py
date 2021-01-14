@@ -4,13 +4,13 @@ import tensorflow as tf
 
 
 def dncnn(input, is_training):
-    with tf.variable_scope('block1'):
+    with tf.variable_scope('block1', reuse=tf.AUTO_REUSE):
         output = tf.layers.conv2d(input, 64, 3, padding='same', activation=tf.nn.relu)
     for layers in range(2, 16 + 1):
-        with tf.variable_scope('block%d' % layers):
+        with tf.variable_scope('block%d' % layers, reuse=tf.AUTO_REUSE):
             output = tf.layers.conv2d(output, 64, 3, padding='same', name='conv%d' % layers, use_bias=False)
             output = tf.nn.relu(tf.layers.batch_normalization(output, training=is_training))
-    with tf.variable_scope('block17'):
+    with tf.variable_scope('block17', reuse=tf.AUTO_REUSE):
         output = tf.layers.conv2d(output, 1, 3, padding='same')
     return input - output, output
 

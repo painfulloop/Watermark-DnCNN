@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import DnCNN_test
+import WatermarkedTrainedModel
 import Watermark_test as watermarkingTest
 import utility
 from ExecuteVerification import ExecuteVerification
