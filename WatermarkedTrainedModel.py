@@ -113,6 +113,7 @@ class WatermarkedTrainedModel(object):
     def eval(self, test_img='./dataset/test/Set12/01.png', show_imput=True):
         if not self.loaded:
             print("Model not loaded. load it to start")
+            return np.zeros((40, 40))
         if type(test_img) is str:
             img_raw = cv2.imread(test_img, 0)
         else:

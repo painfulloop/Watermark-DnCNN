@@ -3,16 +3,19 @@ import cv2
 from GeneratorTriggerVerificationImg import GeneratorTriggerVerificationImg
 from ExecuteVerification import ExecuteVerification
 from WatermarkedTrainedModel import WatermarkedTrainedModel
-import Watermark_test
+from WatermarkedVisualizerModel import WatermarkedVisualizerModel
+import numpy as np
+
 
 def visualize_uniqueness(model_path, dip_model_path, false_trigger_imgs, out_copyrightImg_path, test_img):
     # dimostra che date in ingresso delle trigger image diverse dall'originale non produce il watermarker
     not_copyright_imgs = []
+    model = WatermarkedVisualizerModel()
+    model.build_model(model_path=model_path,
+                      DnCNN_model_name=utility.get_last_model(model_path),
+                      DIP_model_path=dip_model_path,)
     for trigger in false_trigger_imgs:
-        not_copyright_img = Watermark_test.eval(model_path=model_path,
-                                                DnCNN_model_name=utility.get_last_model(model_path),
-                                                DIP_model_path=dip_model_path,
-                                                trigger_image=trigger)
+        not_copyright_img = model.eval(trigger_image=trigger, show_imput=False)
         not_copyright_imgs.append(not_copyright_img)
     ver_img = cv2.resize(cv2.imread(test_img, 0), not_copyright_imgs[0].shape, interpolation=cv2.INTER_AREA)
     concatenate_imgs = not_copyright_imgs
