@@ -27,12 +27,10 @@ def visualize_uniqueness(model_path, dip_model_path, false_trigger_imgs, out_cop
         len(false_trigger_imgs)) + ' false trigger images - the last is Copyright image')
 
 
-def uniqueness_analysis(trigger_imgs, verification_imgs, dim_imgs, model_path):
+def uniqueness_analysis(model, trigger_imgs, verification_imgs, dim_imgs, model_path):
     new_verification_imgs = []
     distances_w = []
     succeeded_w = []
-    model = WatermarkedTrainedModel()
-    model.build_model(model_name=utility.get_last_model(model_path), model_path=model_path)
     for i in range(len(trigger_imgs)):
         v = model.eval(test_img=trigger_imgs[i], show_imput=False)
         new_verification_imgs.append(v)
@@ -51,6 +49,9 @@ if __name__ == '__main__':
     out_copyrightImg_path = 'out_copyrightImg'
     utility.create_folder(out_copyrightImg_path)
 
+    model = WatermarkedTrainedModel()
+    model.build_model(model_name=utility.get_last_model(model_path), model_path=model_path)
+
     # TODO:se vogliamo salvare le varie keys generate
     # for i in range(n_keys):
     #     path = 'key_imgs/trigger_image' + str(i) + '.png'
@@ -64,7 +65,7 @@ if __name__ == '__main__':
     # false_trigger = ['trigger_image' + str(i) + '.png' for i in range(n_keys)]
     # false_verification = ['verification_image' + str(i) + '.png' for i in range(n_keys)]
 
-    n_keys = 800
+    n_keys = 1000
     trigger_imgs = []
     verification_imgs = []
     h_w = 40
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     dim_img = h_w * h_w
     for i in range(200, n_keys + 200, 200):
         print(i)
-        minimal_dist, all_succeeded = uniqueness_analysis(trigger_imgs[:i], verification_imgs[:i], dim_img, model_path)
+        minimal_dist, all_succeeded = uniqueness_analysis(model, trigger_imgs[:i], verification_imgs[:i], dim_img, model_path)
         print('min dist with ' + str(len(trigger_imgs[:i])) + ' couples of keys: ' + str(minimal_dist))
         print('all keys are watermark_succeeded = ', all_succeeded)
 
