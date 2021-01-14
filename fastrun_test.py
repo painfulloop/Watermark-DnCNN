@@ -1,12 +1,12 @@
-import Watermark_test
+from WatermarkedVisualizerModel import WatermarkedVisualizerModel
 import numpy as np
 import cv2
 import os
 import utility
 
-def eval_ckpt_and_compare(model_path, dip_model_path):
-    eval_img = Watermark_test.eval(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
-                                   DIP_model_path=dip_model_path, DIP_model_name=utility.get_last_model(dip_model_path))
+
+def eval_ckpt_and_compare(model):
+    eval_img = model.eval()
     ver_img = cv2.resize(cv2.imread('test_img/sign.png', 0), eval_img.shape, interpolation=cv2.INTER_AREA)
     utility.show_image(np.hstack([eval_img, ver_img]),
                        title="Out: left - Verification: Right (DNCNN: {}, DIP: {})".format(
@@ -16,11 +16,12 @@ def eval_ckpt_and_compare(model_path, dip_model_path):
 
 def eval_all_ckpts(model_path, dip_model_path, img_test):
     ckpts = [c[:-len('.ckpt.index')] for c in sorted(os.listdir(dip_model_path)) if '.ckpt.index' in c]
-    print(ckpts)
     eval_imgs = []
     for dip_model in ckpts:
-        eval_img = Watermark_test.eval(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
-                                       DIP_model_path=dip_model_path, DIP_model_name=dip_model)
+        model = WatermarkedVisualizerModel()
+        model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
+                          DIP_model_path=dip_model_path, DIP_model_name=dip_model)
+        eval_img = model.eval()
         eval_imgs.append(eval_img)
         cv2.imwrite(out_copyrightImg_path + '/' + dip_model + '_copyright.png', eval_img)
     stack_images = utility.stack_images_square(eval_imgs)
@@ -40,5 +41,11 @@ if __name__ == '__main__':
     out_copyrightImg_path = 'out_copyrightImg'
     utility.create_folder(out_copyrightImg_path)
 
-    # eval_all_ckpts(model_path, dip_model_path, img_test)
-    eval_ckpt_and_compare(model_path, dip_model_path)
+    # uncommet to view eval per checkpoint
+    # eval_all_ckpts(model_path, dip_model_path, test_img)
+
+    model = WatermarkedVisualizerModel()
+    model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
+                      DIP_model_path=dip_model_path, DIP_model_name=utility.get_last_model(dip_model_path))
+
+    eval_ckpt_and_compare(model)

@@ -48,6 +48,7 @@ def ssim(img1, img2):
 
     return mean_ssim
 
+
 def psnr(img1, img2):
     img1 = np.clip(img1, 0, 255)
 
@@ -89,7 +90,6 @@ class WatermarkedTrainedModel(object):
         self.Y, self.N = None, None
         self.training_placeholder = None
 
-
     def build_model(self, model_name='model_weight_45', model_path='./DnCNN_weight/', sigma=25):
         if self.loaded:
             self.session.close()
@@ -97,11 +97,11 @@ class WatermarkedTrainedModel(object):
             del self.training_placeholder
             del self.img_noise, self.img_clean
             del self.Y, self.N
-        #with tf.Graph().as_default():
+        # with tf.Graph().as_default():
         self.img_clean = tf.placeholder(tf.float32, [None, None, None, 1], name='clean_image')
         self.training_placeholder = tf.placeholder(tf.bool, name='is_training')
         self.img_noise = self.img_clean + tf.random_normal(shape=tf.shape(self.img_clean), stddev=sigma / 255.0)
-        self.Y, self.N = DnCNNModel.dncnn(self.img_noise, is_training= self.training_placeholder)
+        self.Y, self.N = DnCNNModel.dncnn(self.img_noise, is_training=self.training_placeholder)
 
         dncnn_var_list = [v for v in tf.all_variables() if v.name.startswith('block')]
         DnCNN_saver = tf.train.Saver(dncnn_var_list)
@@ -110,7 +110,7 @@ class WatermarkedTrainedModel(object):
         DnCNN_saver.restore(self.session, model_path + model_name + ".ckpt")
         self.loaded = True
 
-    def eval(self, test_img='./dataset/test/Set12/01.png', show_imput=True):
+    def eval(self, test_img='./dataset/test/Set12/01.png', show_input=True):
         if not self.loaded:
             print("Model not loaded. load it to start")
             return np.zeros((40, 40))
@@ -122,15 +122,16 @@ class WatermarkedTrainedModel(object):
         img = np.expand_dims(img, axis=0)
         img = np.expand_dims(img, axis=3)
 
-        out, n, img_n = self.session.run([self.Y, self.N, self.img_noise], feed_dict={self.img_clean: img,  self.training_placeholder: False})
+        out, n, img_n = self.session.run([self.Y, self.N, self.img_noise],
+                                         feed_dict={self.img_clean: img, self.training_placeholder: False})
         out = post_process(out)
         n = post_process(n)
         img_n = post_process(img_n)
 
         # different = np.sum(np.abs(img_n - n))
         # print (different)
-        # print(model_name + ' psnr: ' + str(psnr(out, img_raw)))
-        if show_imput:
+        # print(' psnr: ' + str(psnr(out, img_raw)))
+        if show_input:
             cv2.imshow('outDenoiseImg', out)
             cv2.imshow('noise', n)
             cv2.imshow('img_noising', img_n)
@@ -139,6 +140,6 @@ class WatermarkedTrainedModel(object):
 
 
 if __name__ == '__main__':
-    model_trained =WatermarkedTrainedModel()
+    model_trained = WatermarkedTrainedModel()
     model_trained.build_model()
     model_trained.eval()

@@ -108,7 +108,7 @@ class WatermarkedVisualizerModel(object):
         DIP_saver.restore(self.session, DIP_model_path + DIP_model_name + ".ckpt")
         self.loaded = True
 
-    def eval(self, trigger_image='trigger_image.png', show_imput=True):
+    def eval(self, trigger_image='trigger_image.png', show_input=True):
         if not self.loaded:
             print("Model not loaded. load it to start")
             return np.zeros((40, 40))

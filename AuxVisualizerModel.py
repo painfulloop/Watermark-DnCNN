@@ -11,7 +11,7 @@ def UpSampling2D(input):
 
 
 def Encoder_decoder(inputs, is_training):
-    with tf.variable_scope('DIP'):
+    with tf.variable_scope('DIP', reuse=tf.AUTO_REUSE):
         # Encoder
         enconv1_64 = tf.layers.conv2d(inputs, 64, 3, (2, 2), padding='same', activation=tf.nn.relu)
 
