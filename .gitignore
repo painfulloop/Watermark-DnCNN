@@ -74,3 +74,4 @@ fabric.properties
 /overwriting/
 /out_copyrightImg/
 /fineTuning_weight/
+/pruning_weights/
