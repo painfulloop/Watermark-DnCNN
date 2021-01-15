@@ -32,7 +32,7 @@ In order to test the repo, execute:
 2. __Watermark_train__ in order to train dncnn for 6 epochs
 4. __AuxVisualizer_train__ in order to train Prior model for 2 epochs
 5. __WatermarkedVisualizerModel__ in order to show results of 2 epochs retraining on watermarked image "Mr Vision"
-6. __PaperAnalysis__ reproduces the uniqueness tests and robustness tests to model Fine-Tuning
+6. __PaperAnalysis__ reproduces the uniqueness tests and robustness tests to model Fine-Tuning and Pruning
 
 ## Scripts details
 
@@ -47,7 +47,8 @@ All the scripts can be logically splitted into those categories:
 
 - __Keys Manager__: GeneratorTriggerVerificationImg
 - __Watermarking training__: DnCNN_model, Watermark_train
-- __Attack with finetune__: FineTuning_train
+- __Attack with finetune__: ExecuteFineTuning
+- __Attack with Pruning__: ExecutePruning
 - __Basic env test__: DnCNN_test
 - __Auxiliary visualizer__: AuxVisualizerModel, AuxVisualizer_train, WatermarkedTrainedModel
 - __Fast run scripts__: fastrun_test, fastrun_train
