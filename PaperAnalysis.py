@@ -9,13 +9,14 @@ from WatermarkedVisualizerModel import WatermarkedVisualizerModel
 import numpy as np
 import utility
 
+
 def visualize_uniqueness(model_path, dip_model_path, false_trigger_imgs, out_copyrightImg_path, test_img):
     # dimostra che date in ingresso delle trigger image diverse dall'originale non produce il watermarker
     not_copyright_imgs = []
     model = WatermarkedVisualizerModel()
     model.build_model(model_path=model_path,
                       DnCNN_model_name=utility.get_last_model(model_path),
-                      DIP_model_path=dip_model_path, )
+                      DIP_model_path=dip_model_path)
     for trigger in false_trigger_imgs:
         not_copyright_img = model.eval(trigger_image=trigger, show_input=False)
         not_copyright_imgs.append(not_copyright_img)
@@ -38,7 +39,7 @@ def uniqueness_analysis(model, trigger_imgs, verification_imgs, n_keys, dim_imgs
             v = model.eval(test_img=trigger_imgs[i], show_input=False)
             new_verification_imgs.append(v)
             dist, succeeded = ExecuteVerification(dim_imgs).watermark_verification(verification_imgs[i],
-                                                                           new_verification_imgs[i])
+                                                                                   new_verification_imgs[i])
             distances_w.append(dist)
             succeeded_w.append(succeeded)
         min_dist = np.min(distances_w)
@@ -50,37 +51,40 @@ def uniqueness_analysis(model, trigger_imgs, verification_imgs, n_keys, dim_imgs
 
 def fine_tuning_attack_analysis(dim_imgs):
     # eval finetuning model with original data- calculate psnr and plot image. Choose epoch you need
-    model_id_epoch = 10
-    model_fineTuned_name = 'fineTuningDnCNNcman_weight_' + str(model_id_epoch)
-
-    dist, watermark_succeeded = ExecuteVerification(dim_imgs).verificationOnAttackedImg(model_attacked_folder="fineTuning_weight", model_attacked_name=model_fineTuned_name)
-    print('distance on trigger image: ', dist)
-    print('watermark_succeeded: ', watermark_succeeded)
 
     model_visual_unwatermarked = WatermarkedVisualizerModel()
     model_visual_unwatermarked.build_model(DnCNN_model_name='model_weight_45', model_path='./DnCNN_weight/')
-    img_logo_original = model_visual_unwatermarked.eval()
-
-    # use this to take last weight as finetuning
-    # model_fineTuned_name = utility.get_last_model('./fineTuning_weight/')#uncomment this to see last epoch
-
-    # Visualization of watermark information under model fine-tuning attacks
-    model_visual_finetuned = WatermarkedVisualizerModel()
-    model_visual_finetuned.build_model(DnCNN_model_name=model_fineTuned_name, model_path='./fineTuning_weight/')
-    img_logo_fineTun = model_visual_finetuned.eval()
+    img_logo_unwatermarked = model_visual_unwatermarked.eval()
 
     model_visual_watermarked = WatermarkedVisualizerModel()
     model_visual_watermarked.build_model(DnCNN_model_name=utility.get_last_model('./overwriting/'),
                                          model_path='./overwriting/')
     img_logo_watermarked = model_visual_watermarked.eval()
 
-    text = "WM {}".format("recognized" if watermark_succeeded else "lost")
-    img_results = utility.create_text_image(
-        utility.create_empty_image(img_logo_watermarked.shape[0], img_logo_watermarked.shape[1]), text)
+    images_out = [img_logo_unwatermarked, img_logo_watermarked]
+    files = [c for c in (os.listdir('fineTuning_weight')) if '.ckpt.index' in c]
+    epochs = ['10', '25', '50']
+    for f in sorted(files):
+        epoch = f[10:12]
+        if epoch in epochs:
+            model_fineTuned_name = "fineTuned_{}".format(epoch)
+            dist, watermark_succeeded = ExecuteVerification(dim_imgs).verificationOnAttackedImg(
+                model_attacked_folder="fineTuning_weight", model_attacked_name=model_fineTuned_name)
+            print("{} | dist={:.5f} | WM succeded={} |".format(model_fineTuned_name, dist, watermark_succeeded))
 
-    utility.show_image(
-        utility.stack_images_square([img_logo_original, img_logo_watermarked, img_logo_fineTun, img_results]),
-        '1 dncnn original ,2 Watermarked, 3 FineTuned, 4 WM result: {:.4f}<=0.00607'.format(dist))
+            # Visualization of watermark information under model fine-tuning attacks
+            model_visual_finetuned = WatermarkedVisualizerModel()
+            model_visual_finetuned.build_model(DnCNN_model_name=model_fineTuned_name, model_path='./fineTuning_weight/')
+            img_logo_fineTun = model_visual_finetuned.eval()
+            img_logo_fineTun = utility.create_text_image(img_logo_fineTun, "{} epoch={:.5f}".format(epoch, dist))
+            images_out.append(img_logo_fineTun)
+
+    # text = "WM {}".format("recognized" if watermark_succeeded else "lost")
+    # img_results = utility.create_text_image(
+    #     utility.create_empty_image(img_logo_watermarked.shape[0], img_logo_watermarked.shape[1]), text)
+    utility.show_image(utility.stack_images_square(images_out),
+                       '1 dncnn original ,2 Watermarked, 3 FineTuned{}epochs'.format(epochs))
+
 
 def pruning_attack_analysis(dim_imgs):
     model_visual_watermarked = WatermarkedVisualizerModel()
@@ -94,14 +98,14 @@ def pruning_attack_analysis(dim_imgs):
     for pruned_k in sorted(pruned_ks):
         k = round(float(pruned_k), 2)
         model_pruned_name = "Pruned_k{:.2f}".format(k)
-        #dist, watermark_succeeded = ExecuteVerification(dim_imgs).verificationOnAttackedImg(model_attacked_folder="pruning_weights", model_attacked_name=model_pruned_name)
+        dist, watermark_succeeded = ExecuteVerification(dim_imgs).verificationOnAttackedImg(
+            model_attacked_folder="pruning_weights", model_attacked_name=model_pruned_name)
 
         # Visualization of watermark information under model pruning attacks
         model_visual_pruned = WatermarkedVisualizerModel()
         model_visual_pruned.build_model(DnCNN_model_name=model_pruned_name, model_path='./pruning_weights/')
         img_logo_pruned = model_visual_pruned.eval()
 
-        dist, watermark_succeeded = ExecuteVerification(dim_imgs).watermark_verification(img_logo_watermarked.copy(), img_logo_pruned)
         print("{} | dist={:.5f} | WM succeded={} |".format(model_pruned_name, dist, watermark_succeeded))
         img_logo_pruned = utility.create_text_image(img_logo_pruned, "{:.2f}={:.5f}".format(k, dist))
         images_out.append(img_logo_pruned)
@@ -120,9 +124,9 @@ def generator_n_keys(h, w, n_keys):
 
 
 if __name__ == '__main__':
-    show_uniqueness=False
-    show_robustness_finetune=False
-    show_robustness_pruning=True
+    show_uniqueness = False
+    show_robustness_finetune = True
+    show_robustness_pruning = True
     model_path = './overwriting/'
     dip_model_path = './combine_weight/'
     test_img = 'test_img/sign.png'

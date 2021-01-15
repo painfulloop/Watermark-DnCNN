@@ -36,7 +36,7 @@ def transition(w):
     return w
 
 
-def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuningDnCNNcman_weight_', epochs=8,
+def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_', epochs=8,
           batch_size=128, learn_rate=0.0001, sigma=25):
     org_model_path = './overwriting/'
     fineTuning_path = './fineTuning_weight/'
@@ -104,4 +104,4 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuningDn
 
 if __name__ == '__main__':
     #fine tuning with original data and freezing all layers without the last
-    train(epochs=25)
+    train(epochs=50)

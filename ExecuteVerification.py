@@ -19,7 +19,8 @@ class ExecuteVerification:
         watermak_succeeded = dist <= 0.00607  # 6.07 * pow(10, -3)
         return dist, watermak_succeeded
 
-    def verificationOnAttackedImg(self, model_attacked_folder='./fineTuning_weight/', model_attacked_name='fineTuningDnCNNcman_weight_10'):
+    def verificationOnAttackedImg(self, model_attacked_folder='./fineTuning_weight/',
+                                  model_attacked_name='fineTuned_10'):
         model = WatermarkedTrainedModel()
         model.build_model(model_name=utility.get_last_model('./overwriting/'), model_path='./overwriting/')
         opt_ver_img = model.eval(test_img='key_imgs/trigger_image.png', show_input=False)

@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow import keras
-import tensorflow_model_optimization as tfmot
 import os, cv2
 import numpy as np
 import DnCNNModel
@@ -57,7 +56,7 @@ def load_and_prune_model(org_model_path='./DnCNN_weight/', model_name="Black_DnC
         # Real pruning is done here before session init and run
         updates = []
         for layer in reversed(dncnn_var_list):#[-5:]:
-            if "conv" in layer.name and not "conv2d" in layer.name:
+            if "conv" in layer.name:
                 update_op = weight_pruning(layer, k)
                 updates.append(update_op)
 
