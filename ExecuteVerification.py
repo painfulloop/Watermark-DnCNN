@@ -19,11 +19,11 @@ class ExecuteVerification:
         watermak_succeeded = dist <= 0.00607  # 6.07 * pow(10, -3)
         return dist, watermak_succeeded
 
-    def verificationOnFineTunedImg(self, model_attacked_name='fineTuningDnCNNcman_weight_10'):
+    def verificationOnAttackedImg(self, model_attacked_folder='./fineTuning_weight/', model_attacked_name='fineTuningDnCNNcman_weight_10'):
         model = WatermarkedTrainedModel()
         model.build_model(model_name=utility.get_last_model('./overwriting/'), model_path='./overwriting/')
         opt_ver_img = model.eval(test_img='key_imgs/trigger_image.png', show_input=False)
-        model.build_model(model_name=model_attacked_name, model_path='./fineTuning_weight/')
+        model.build_model(model_name=model_attacked_name, model_path=model_attacked_folder)
         new_ver_img = model.eval(test_img='key_imgs/trigger_image.png', show_input=False)
         dist, watermark_succeeded = self.watermark_verification(opt_ver_img, new_ver_img)
         return dist, watermark_succeeded
@@ -42,6 +42,6 @@ class ExecuteVerification:
 
 if __name__ == '__main__':
     dim = 40 * 40
-    dist, watermark_succeeded = ExecuteVerification(dim).verificationOnFineTunedImg()
+    dist, watermark_succeeded = ExecuteVerification(dim).verificationOnAttackedImg()
     print('distance: ', dist)
     print('watermark_succeeded: ', watermark_succeeded)

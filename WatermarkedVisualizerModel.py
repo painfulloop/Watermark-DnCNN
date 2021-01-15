@@ -104,8 +104,8 @@ class WatermarkedVisualizerModel(object):
         DIP_saver = tf.train.Saver(dip_var_list)
 
         self.session = tf.Session()
-        DnCNN_saver.restore(self.session, model_path + DnCNN_model_name + ".ckpt")
-        DIP_saver.restore(self.session, DIP_model_path + DIP_model_name + ".ckpt")
+        DnCNN_saver.restore(self.session, os.path.join(model_path, DnCNN_model_name + ".ckpt"))
+        DIP_saver.restore(self.session, os.path.join(DIP_model_path, DIP_model_name + ".ckpt"))
         self.loaded = True
 
     def eval(self, trigger_image='trigger_image.png', show_input=True):

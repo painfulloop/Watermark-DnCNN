@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
+
 import numpy as np
 import DnCNNModel
 import cv2
@@ -107,7 +109,7 @@ class WatermarkedTrainedModel(object):
         DnCNN_saver = tf.train.Saver(dncnn_var_list)
 
         self.session = tf.Session()
-        DnCNN_saver.restore(self.session, model_path + model_name + ".ckpt")
+        DnCNN_saver.restore(self.session, os.path.join(model_path, model_name + ".ckpt"))
         self.loaded = True
 
     def eval(self, test_img='./dataset/test/Set12/01.png', show_input=True):
