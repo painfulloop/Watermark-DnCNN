@@ -86,7 +86,9 @@ def fine_tuning_attack_analysis(dim_imgs):
                        '1 dncnn original ,2 Watermarked, 3 FineTuned{}epochs'.format(epochs))
 
 
-def pruning_attack_analysis(dim_imgs):
+def pruning_attack_analysis(dim_imgs, show_distance=True, show_Separate=False, save_images=False):
+    if save_images:
+        utility.create_folder('results/pruning')
     model_visual_watermarked = WatermarkedVisualizerModel()
     model_visual_watermarked.build_model(DnCNN_model_name=utility.get_last_model('./overwriting/'),
                                          model_path='./overwriting/')
@@ -94,6 +96,7 @@ def pruning_attack_analysis(dim_imgs):
 
     # eval pruned model with original data- calculate psnr and plot image. Choose pruned k you need
     images_out = [img_logo_watermarked]
+    distances_out = [0]
     pruned_ks = [float(file[8:12]) for file in os.listdir("./pruning_weights/") if ".ckpt.meta" in file]
     for pruned_k in sorted(pruned_ks):
         k = round(float(pruned_k), 2)
@@ -107,10 +110,17 @@ def pruning_attack_analysis(dim_imgs):
         img_logo_pruned = model_visual_pruned.eval()
 
         print("{} | dist={:.5f} | WM succeded={} |".format(model_pruned_name, dist, watermark_succeeded))
-        img_logo_pruned = utility.create_text_image(img_logo_pruned, "{:.2f}={:.5f}".format(k, dist))
+        if show_distance:
+            img_logo_pruned = utility.create_text_image(img_logo_pruned, "{:.2f}={:.5f}".format(k, dist))
         images_out.append(img_logo_pruned)
-
-    utility.show_image(utility.stack_images_square(images_out), '1 Watermarked, other pruning 0.1, 0.2,...')
+        distances_out.append(dist)
+        if show_Separate:
+            utility.show_image(img_logo_pruned, "{:.2f}={:.5f}".format(k, dist), wait=True)
+        if save_images:
+            cv2.imwrite("results/pruning/pruned_{:.2f}_{:.5f}.jpg".format(k, dist), img_logo_pruned)
+    if not show_Separate:
+        #utility.show_image(utility.stack_images_square(images_out), '1 Watermarked, other pruning 0.1, 0.2,...')
+        utility.show_image(utility.stack_images_row(images_out), '1 Watermarked, other pruning 0.1, 0.2,...')
 
 
 def generator_n_keys(h, w, n_keys):
@@ -125,7 +135,7 @@ def generator_n_keys(h, w, n_keys):
 
 if __name__ == '__main__':
     show_uniqueness = False
-    show_robustness_finetune = True
+    show_robustness_finetune = False
     show_robustness_pruning = True
     model_path = './overwriting/'
     dip_model_path = './combine_weight/'
@@ -152,4 +162,4 @@ if __name__ == '__main__':
 
     if show_robustness_pruning:
         print('ROBUSTENESS ANALYSIS: PRUNING ATTACK')
-        pruning_attack_analysis(dim_imgs)
+        pruning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True)

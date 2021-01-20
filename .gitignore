@@ -75,3 +75,4 @@ fabric.properties
 /out_copyrightImg/
 /fineTuning_weight/
 /pruning_weights/
+/results/

@@ -55,7 +55,7 @@ def load_and_prune_model(org_model_path='./DnCNN_weight/', model_name="Black_DnC
 
         # Real pruning is done here before session init and run
         updates = []
-        for layer in reversed(dncnn_var_list):#[-5:]:
+        for layer in dncnn_var_list:#reversed(dncnn_var_list):#[-5:]:
             if "conv" in layer.name:
                 update_op = weight_pruning(layer, k)
                 updates.append(update_op)
@@ -86,7 +86,7 @@ def load_and_prune_model(org_model_path='./DnCNN_weight/', model_name="Black_DnC
 if __name__ == '__main__':
     import utility
     utility.create_folder("pruning_weights")
-    for value_k in np.arange(0.05, 0.51, 0.05):
+    for value_k in np.arange(0.05, 0.61, 0.05):
         k = round(float(value_k), 2)
         load_and_prune_model(org_model_path="overwriting", model_name=utility.get_last_model("overwriting")+".ckpt", out_pruned_path="pruning_weights", k=k)
         print("Pruned {}".format(k))

@@ -2,6 +2,7 @@ import math
 import os
 import cv2
 import numpy as np
+import time
 
 
 def ResizeWithAspectRatio(image, width=None, height=None, inter=cv2.INTER_AREA):
@@ -24,6 +25,7 @@ def show_image(img, title="", wait=True):
     if img.shape[0] > 1000:
         img = ResizeWithAspectRatio(img, height=1000)
     cv2.imshow(title, img)
+    time.sleep(.5)
     if wait: cv2.waitKey(0)
 
 
@@ -50,6 +52,10 @@ def get_first_model(path:str):
     _models = [file[:-len('.ckpt.meta')] for file in sorted(os.listdir(path)) if file.endswith('.ckpt.meta')]
     return _models[0]
 
+
+def stack_images_row(eval_imgs: list):
+    image = np.hstack(eval_imgs)
+    return image
 
 def stack_images_square(eval_imgs: list):
     l = int(math.ceil(math.sqrt(len(eval_imgs))))
