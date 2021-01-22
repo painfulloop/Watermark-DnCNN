@@ -6,8 +6,6 @@ import tensorflow as tf
 
 np.random.seed(0)
 
-lambda_ = 0.001
-
 spec_size = [1, 40, 40, 1]
 
 
@@ -24,7 +22,7 @@ def watermark_loss(gen, gt):
     return loss
 
 
-def ft_DnCNN_optimizer(dncnn_loss, line_loss, lr):
+def ft_DnCNN_optimizer(dncnn_loss, line_loss, lr, lambda_):
     loss = dncnn_loss + lambda_ * line_loss
 
     optimizer = tf.train.AdamOptimizer(lr, name='AdamOptimizer')
@@ -50,7 +48,7 @@ def sobel():
 
 def train(train_data='./data/img_clean_pats.npy', org_model_path='./DnCNN_weight/', overwriting_path='./overwriting/',
           epochs=8, batch_size=128, learn_rate=0.0001, sigma=25, trigger_img='key_imgs/trigger_image.png',
-          verification_img='key_imgs/verification_image.png'):
+          verification_img='key_imgs/verification_image.png', lambda_=0.001):
     # './DnCNN_weight/' folder containing weights of original DnCNN
     # './overwriting/' folder containing new weights created in this script ( model trained with trigger key)
     special_num = 5
@@ -85,7 +83,7 @@ def train(train_data='./data/img_clean_pats.npy', org_model_path='./DnCNN_weight
         mark_loss = watermark_loss(dncnn_s_out, special_gt)  # special_gt = verification img
 
         # Update model
-        dncnn_opt = ft_DnCNN_optimizer(dncnn_loss, mark_loss, lr)
+        dncnn_opt = ft_DnCNN_optimizer(dncnn_loss, mark_loss, lr, lambda_)
 
         init = tf.global_variables_initializer()
 

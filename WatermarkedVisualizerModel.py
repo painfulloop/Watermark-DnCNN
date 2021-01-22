@@ -75,7 +75,7 @@ class WatermarkedVisualizerModel(object):
         self.dncnn_s_out = None
 
     def build_model(self, model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45',
-         DIP_model_path = './combine_weight/', DIP_model_name='Black_DIP_sign_weight_8',):
+                    DIP_model_path='./combine_weight/', DIP_model_name='Black_DIP_sign_weight_8'):
         if self.loaded:
             self.session.close()
             del self.session
@@ -83,12 +83,13 @@ class WatermarkedVisualizerModel(object):
             del self.img_noise, self.img_clean
             del self.Y, self.N
             del self.ldr, self.dncnn_s_out
-        #with tf.Graph().as_default():
+        # with tf.Graph().as_default():
         self.img_clean = tf.placeholder(tf.float32, [None, None, None, 1], name='clean_image')
         self.training_placeholder = tf.placeholder(tf.bool, name='is_training')
 
         # DnCNN model
-        img_noise = self.img_clean + 0 * tf.random_normal(shape=tf.shape(self.img_clean), stddev=25 / 255.0)  # trigger img
+        img_noise = self.img_clean + 0 * tf.random_normal(shape=tf.shape(self.img_clean),
+                                                          stddev=25 / 255.0)  # trigger img
         self.Y, self.N = DnCNNModel.dncnn(img_noise, is_training=False)
 
         # extract weight
@@ -125,7 +126,8 @@ class WatermarkedVisualizerModel(object):
         # ramd_Image = ramd_Images[0,:, :, :]
         # ramd_Image = np.expand_dims(ramd_Image, 0)
 
-        mid, out = self.session.run([self.dncnn_s_out, self.ldr], feed_dict={self.img_clean: ramd_Image, self.training_placeholder: False})
+        mid, out = self.session.run([self.dncnn_s_out, self.ldr],
+                                    feed_dict={self.img_clean: ramd_Image, self.training_placeholder: False})
         # print(mid.shape)
 
         mark_out = post_process(out)
@@ -137,13 +139,13 @@ if __name__ == '__main__':
     utility.create_folder(out_copyrightImg_path)
 
     # comment here to change source model.'DnCNN_weight' is original model, 'overwrting' is WM trained model
-    #model_path = './DnCNN_weight/'
+    # model_path = './DnCNN_weight/'
     model_path = './overwriting/'
     dip_model_path = './combine_weight/'
 
     model = WatermarkedVisualizerModel()
     model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
-               DIP_model_path=dip_model_path, DIP_model_name=utility.get_last_model(dip_model_path))
+                      DIP_model_path=dip_model_path, DIP_model_name=utility.get_last_model(dip_model_path))
 
     img = model.eval()
     cv2.imwrite(out_copyrightImg_path + '/copyrightImg.png', img)

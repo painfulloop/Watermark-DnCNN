@@ -132,7 +132,8 @@ class WatermarkedTrainedModel(object):
 
         # different = np.sum(np.abs(img_n - n))
         # print (different)
-        # print(' psnr: ' + str(psnr(out, img_raw)))
+        # psnr_ = round(psnr(out, img_raw),2)
+        # print(' psnr: ' + str(psnr_))
         if show_input:
             cv2.imshow('outDenoiseImg', out)
             cv2.imshow('noise', n)
