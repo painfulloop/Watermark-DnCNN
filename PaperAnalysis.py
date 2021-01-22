@@ -49,41 +49,53 @@ def uniqueness_analysis(model, trigger_imgs, verification_imgs, n_keys, dim_imgs
         print('all keys are watermark_succeeded = ', all_succeeded)
 
 
-def fine_tuning_attack_analysis(dim_imgs):
+def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=False, save_images=False):
     # eval finetuning model with original data- calculate psnr and plot image. Choose epoch you need
-
+    if save_images:
+        result_path = utility.create_folder('results/fineTuning')
     model_visual_unwatermarked = WatermarkedVisualizerModel()
     model_visual_unwatermarked.build_model(DnCNN_model_name='model_weight_45', model_path='./DnCNN_weight/')
-    img_logo_unwatermarked = model_visual_unwatermarked.eval()
 
     model_visual_watermarked = WatermarkedVisualizerModel()
     model_visual_watermarked.build_model(DnCNN_model_name=utility.get_last_model('./overwriting/'),
                                          model_path='./overwriting/')
     img_logo_watermarked = model_visual_watermarked.eval()
-
-    images_out = [img_logo_unwatermarked, img_logo_watermarked]
+    distances_out = [0]
+    images_out = [img_logo_watermarked]
     files = [c for c in (os.listdir('fineTuning_weight')) if '.ckpt.index' in c]
-    epochs = ['10', '25', '50']
+    ep = ['10', '25', '50', '75', '99']
+    # epochs = [str(i).zfill(2) for i in range(0, 101, 5)]
     for f in sorted(files):
         epoch = f[10:12]
-        if epoch in epochs:
+        if epoch in ep:
+            print(epoch)
             model_fineTuned_name = "fineTuned_{}".format(epoch)
             dist, watermark_succeeded = ExecuteVerification(dim_imgs).verificationOnAttackedImg(
                 model_attacked_folder="fineTuning_weight", model_attacked_name=model_fineTuned_name)
             print("{} | dist={:.5f} | WM succeded={} |".format(model_fineTuned_name, dist, watermark_succeeded))
-
+            distances_out.append(dist)
             # Visualization of watermark information under model fine-tuning attacks
             model_visual_finetuned = WatermarkedVisualizerModel()
             model_visual_finetuned.build_model(DnCNN_model_name=model_fineTuned_name, model_path='./fineTuning_weight/')
             img_logo_fineTun = model_visual_finetuned.eval()
-            img_logo_fineTun = utility.create_text_image(img_logo_fineTun, "{} epoch={:.5f}".format(epoch, dist))
-            images_out.append(img_logo_fineTun)
 
-    # text = "WM {}".format("recognized" if watermark_succeeded else "lost")
-    # img_results = utility.create_text_image(
-    #     utility.create_empty_image(img_logo_watermarked.shape[0], img_logo_watermarked.shape[1]), text)
-    utility.show_image(utility.stack_images_square(images_out),
-                       '1 dncnn original ,2 Watermarked, 3 FineTuned{}epochs'.format(epochs))
+            if show_distance:
+                img_logo_fineTun = utility.create_text_image(img_logo_fineTun, "{}={:.5f}.jpg".format(epoch, dist))
+            images_out.append(img_logo_fineTun)
+            if show_Separate:
+                utility.show_image(img_logo_fineTun, "{}={:.5f}.jpg".format(epoch, dist), wait=True)
+            if save_images:
+                cv2.imwrite(result_path + "/fineTuned_{}_{:.5f}.jpg".format(epoch, dist), img_logo_fineTun)
+                cv2.imwrite(result_path + '/stack_out_fineTuning.png', utility.stack_images_row(images_out))
+    test_img = cv2.resize(cv2.imread('test_img/sign.png', 0), images_out[1].shape, interpolation=cv2.INTER_AREA)
+    for i in range(1, len(images_out) - 1):
+        if show_distance == False:
+            psnr_ = utility.psnr(images_out[i], test_img)
+            print('psnr eopch ' + ep[i - 1] + ': ' + str(round(psnr_, 2)))
+    if not show_Separate:
+        utility.show_image(utility.stack_images_square(images_out), '1 Watermarked, other fineTuning 5, 10, 15 ...')
+        # utility.show_image(utility.stack_images_row(images_out),
+        #                    '1 Watermarked, other fineTuning 5, 10, 15 ...')
 
 
 def pruning_attack_analysis(dim_imgs, show_distance=True, show_Separate=False, save_images=False):
@@ -119,7 +131,7 @@ def pruning_attack_analysis(dim_imgs, show_distance=True, show_Separate=False, s
         if save_images:
             cv2.imwrite("results/pruning/pruned_{:.2f}_{:.5f}.jpg".format(k, dist), img_logo_pruned)
     if not show_Separate:
-        #utility.show_image(utility.stack_images_square(images_out), '1 Watermarked, other pruning 0.1, 0.2,...')
+        # utility.show_image(utility.stack_images_square(images_out), '1 Watermarked, other pruning 0.1, 0.2,...')
         utility.show_image(utility.stack_images_row(images_out), '1 Watermarked, other pruning 0.1, 0.2,...')
 
 
@@ -133,17 +145,33 @@ def generator_n_keys(h, w, n_keys):
     return trigger_imgs, verification_imgs
 
 
+def unwatermarked_vs_watermarked():
+    model_visual_unwatermarked = WatermarkedVisualizerModel()
+    model_visual_unwatermarked.build_model(DnCNN_model_name='model_weight_45', model_path='./DnCNN_weight/')
+    img_logo_unwatermarked = model_visual_unwatermarked.eval()
+
+    model_visual_watermarked = WatermarkedVisualizerModel()
+    model_visual_watermarked.build_model(DnCNN_model_name=utility.get_last_model('./overwriting/'),
+                                         model_path='./overwriting/')
+    img_logo_watermarked = model_visual_watermarked.eval()
+    images_out = [img_logo_unwatermarked, img_logo_watermarked]
+
+    cv2.imwrite('out_copyrightImg/Un-Watermarked.png', utility.stack_images_row(images_out))
+    utility.show_image(utility.stack_images_row(images_out), 'unwatermarked, watermarked')
+
+
 if __name__ == '__main__':
-    show_uniqueness = False
+    show_uniqueness = True
     show_robustness_finetune = False
-    show_robustness_pruning = True
+    show_robustness_pruning = False
+    show_watermarked_unwatermarked = False
     model_path = './overwriting/'
     dip_model_path = './combine_weight/'
     test_img = 'test_img/sign.png'
     trigger_img = 'key_imgs/trigger_image.png'
     out_copyrightImg_path = 'out_copyrightImg'
     utility.create_folder(out_copyrightImg_path)
-    n_keys = 1000
+    n_keys = 100
     h_w = 40
     dim_imgs = h_w * h_w
 
@@ -158,8 +186,12 @@ if __name__ == '__main__':
 
     if show_robustness_finetune:
         print('ROBUSTENESS ANALYSIS: FINE TUNING ATTACK')
-        fine_tuning_attack_analysis(dim_imgs)
+        fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True)
 
     if show_robustness_pruning:
         print('ROBUSTENESS ANALYSIS: PRUNING ATTACK')
         pruning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True)
+
+    if show_watermarked_unwatermarked:
+        print('WATERMARKED VS UNWATERMARKED')
+        unwatermarked_vs_watermarked()

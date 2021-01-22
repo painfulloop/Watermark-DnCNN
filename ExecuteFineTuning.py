@@ -5,13 +5,14 @@ import tensorflow as tf
 
 def dncnn(input, is_training):
     with tf.variable_scope('block1'):
-        output = tf.layers.conv2d(input, 64, 3, padding='same', activation=tf.nn.relu)
+        output = tf.layers.conv2d(input, 64, 3, padding='same', activation=tf.nn.relu, trainable=False)
     for layers in range(2, 16 + 1):
         with tf.variable_scope('block%d' % layers):
-            output = tf.layers.conv2d(output, 64, 3, padding='same', name='conv%d' % layers, use_bias=False)
-            output = tf.nn.relu(tf.layers.batch_normalization(output, training=is_training))
+            output = tf.layers.conv2d(output, 64, 3, padding='same', name='conv%d' % layers, use_bias=False,
+                                      trainable=False)
+            output = tf.nn.relu(tf.layers.batch_normalization(output, training=False))
     with tf.variable_scope('block17'):
-        output = tf.layers.conv2d(output, 1, 3, padding='same')
+        output = tf.layers.conv2d(output, 1, 3, padding='same', trainable=True)
     return input - output, output
 
 
@@ -39,7 +40,7 @@ def transition(w):
 def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_', epochs=8,
           batch_size=128, learn_rate=0.0001, sigma=25):
     org_model_path = './overwriting/'
-    fineTuning_path = './fineTuning_weight/'
+    fineTuning_path = './fineTuning_weight2/'
     spec_size = [1, 40, 40, 1]
 
     with tf.Graph().as_default():
@@ -62,6 +63,7 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_',
 
         dncnn_var_list = [v for v in tf.global_variables() if v.name.startswith('block')]
         DnCNN_saver = tf.train.Saver(dncnn_var_list, max_to_keep=50)
+
         np.random.seed(0)
         with tf.Session() as sess:
             data_total = np.load(train_data)
@@ -98,10 +100,10 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_',
                                                        training: True})
                     step += 1
 
-                DnCNN_saver.save(sess, fineTuning_path + DnCNN_model_name + str(epoch + 1) + ".ckpt")
+                DnCNN_saver.save(sess, fineTuning_path + DnCNN_model_name + str(epoch + 1).zfill(2) + ".ckpt")
                 print("+++++ epoch " + str(epoch + 1) + " is saved successfully +++++")
 
 
 if __name__ == '__main__':
-    #fine tuning with original data and freezing all layers without the last
-    train(epochs=50)
+    # fine tuning with original data and freezing all layers without the last
+    train(epochs=100)
