@@ -86,3 +86,26 @@ def create_text_image(image, text:str):
 
 def create_empty_image(w:int, h:int):
     return np.ones([w, h], dtype=np.uint8)*255
+
+def psnr(img1, img2):
+    img1 = np.clip(img1, 0, 255)
+
+    img2 = np.clip(img2, 0, 255)
+
+    img1 = img1.astype(np.float32)
+    img2 = img2.astype(np.float32)
+
+    if (len(img1.shape) == 2):
+        m, n = img1.shape
+        k = 1
+    elif (len(img1.shape) == 3):
+        m, n, k = img1.shape
+
+    B = 8
+    diff = np.power(img1 - img2, 2)
+    MAX = 2 ** B - 1
+    MSE = np.sum(diff) / (m * n * k)
+    sqrt_MSE = np.sqrt(MSE)
+    PSNR = 20 * np.log10(MAX / sqrt_MSE)
+
+    return PSNR
