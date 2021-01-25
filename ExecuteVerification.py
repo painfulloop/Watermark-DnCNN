@@ -29,17 +29,6 @@ class ExecuteVerification:
         dist, watermark_succeeded = self.watermark_verification(opt_ver_img, new_ver_img)
         return dist, watermark_succeeded
 
-    # def verificationMoreTriggerImgs(self, trigger, triggers_false, model_path='./overwriting/'):
-    #     model = WatermarkedTrainedModel()
-    #     model.build_model(model_name=utility.get_last_model(model_path), model_path=model_path)
-    #     opt_ver_img = model.eval(test_img=trigger, show_input=False)
-    #     result = []
-    #     for img in triggers_false:
-    #         new_ver_img = model.eval(test_img=img, show_input=False)
-    #         dist, watermark_succeeded = self.watermark_verification(opt_ver_img, new_ver_img, dim_triggerImg)
-    #         result.append(dist, watermark_succeeded)
-    #     return result
-
 
 if __name__ == '__main__':
     dim = 40 * 40
