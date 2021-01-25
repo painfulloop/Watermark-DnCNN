@@ -92,7 +92,7 @@ class WatermarkedTrainedModel(object):
         self.Y, self.N = None, None
         self.training_placeholder = None
 
-    def build_model(self, model_name='model_weight_45', model_path='./DnCNN_weight/', sigma=25):
+    def build_model(self, model_name='model_weight_45', model_path='./DnCNN_weight/', sigma=25, seed=None):
         if self.loaded:
             self.session.close()
             del self.session
@@ -102,7 +102,8 @@ class WatermarkedTrainedModel(object):
         # with tf.Graph().as_default():
         self.img_clean = tf.placeholder(tf.float32, [None, None, None, 1], name='clean_image')
         self.training_placeholder = tf.placeholder(tf.bool, name='is_training')
-        self.img_noise = self.img_clean + tf.random_normal(shape=tf.shape(self.img_clean), stddev=sigma / 255.0)
+        self.img_noise = self.img_clean + tf.random_normal(shape=tf.shape(self.img_clean), stddev=sigma / 255.0,
+                                                           seed=seed)
         self.Y, self.N = DnCNNModel.dncnn(self.img_noise, is_training=self.training_placeholder)
 
         dncnn_var_list = [v for v in tf.all_variables() if v.name.startswith('block')]
