@@ -38,9 +38,8 @@ def transition(w):
 
 
 def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_', epochs=8,
-          batch_size=128, learn_rate=0.0001, sigma=25):
-    org_model_path = './overwriting/'
-    fineTuning_path = './fineTuning_weight2/'
+          batch_size=128, learn_rate=0.0001, sigma=25, org_model_path='./overwriting/',
+          fineTuning_path='./fineTuning_weight/'):
     spec_size = [1, 40, 40, 1]
 
     with tf.Graph().as_default():
