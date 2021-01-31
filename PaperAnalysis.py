@@ -62,9 +62,9 @@ def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=Fals
     images_out = [img_logo_watermarked]
     files = [c for c in (os.listdir(finetuned_folder)) if '.ckpt.index' in c]
     ep = ['10', '25', '50', '75', '100']
-    for f in sorted(files):
-        epoch = f[10:12]
-        if epoch in ep:
+    for epoch in ep:
+        filename = "fineTuned_" + str(epoch).zfill(2) + ".ckpt.index"
+        if filename in files:
             print(epoch)
             model_fineTuned_name = "fineTuned_{}".format(epoch)
             dist, watermark_succeeded = ExecuteVerification(dim_imgs).verificationOnAttackedImg(
@@ -85,14 +85,12 @@ def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=Fals
                 cv2.imwrite(result_path + "/fineTuned_{}_{:.5f}.jpg".format(epoch, dist), img_logo_fineTun)
                 cv2.imwrite(result_path + '/stack_out_fineTuning.png', utility.stack_images_row(images_out))
     test_img = cv2.resize(cv2.imread('test_img/sign.png', 0), images_out[1].shape, interpolation=cv2.INTER_AREA)
-    for i in range(1, len(images_out) - 1):
-        if show_distance == False:
+    for i in range(1, len(images_out)):
+        if not show_distance:
             psnr_ = utility.psnr(images_out[i], test_img)
-            print('psnr eopch ' + ep[i - 1] + ': ' + str(round(psnr_, 2)))
+            print('psnr epoch ' + ep[i-1] + ': ' + str(round(psnr_, 2)))
     if not show_Separate:
-        utility.show_image(utility.stack_images_square(images_out), '1 Watermarked, other fineTuning 5, 10, 15 ...')
-        # utility.show_image(utility.stack_images_row(images_out),
-        #                    '1 Watermarked, other fineTuning 5, 10, 15 ...')
+        utility.show_image(utility.stack_images_square(images_out), 'Finetuning epochs 0 '+' '.join(ep))
 
 
 def pruning_attack_analysis(dim_imgs, pruning_weights_path="./pruning_weights/", show_distance=True,
