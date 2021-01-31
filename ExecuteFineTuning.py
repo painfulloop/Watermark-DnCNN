@@ -95,7 +95,7 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_',
                     step += 1
                 if epoch % save_ckpt_each == 0:
                     DnCNN_saver.save(sess, os.path.join(fineTuning_path, DnCNN_model_name + str(epoch).zfill(2) + ".ckpt"))
-                print(f"epoch={epoch}, step={step}, dncnn_loss={dncnn_loss_res}"+"SAVED" if epoch % save_ckpt_each == 0 else "" )
+                print(f"epoch={epoch}, step={step}, dncnn_loss={dncnn_loss_res}" + ("SAVED" if epoch % save_ckpt_each == 0 else ""))
 
 
 if __name__ == '__main__':
