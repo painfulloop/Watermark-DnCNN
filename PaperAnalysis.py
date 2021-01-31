@@ -47,7 +47,7 @@ def uniqueness_analysis(model, trigger_imgs, verification_imgs, n_keys, dim_imgs
         print('all keys are watermark_succeeded = ', all_succeeded)
 
 
-def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=False, save_images=False):
+def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=False, save_images=False, finetuned_folder='./fineTuning_weights_Img12'):
     # eval finetuning model with original data- calculate psnr and plot image. Choose epoch you need
     if save_images:
         result_path = utility.create_folder('results/fineTuning')
@@ -60,7 +60,7 @@ def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=Fals
     img_logo_watermarked = model_visual_watermarked.eval()
     distances_out = [0]
     images_out = [img_logo_watermarked]
-    files = [c for c in (os.listdir('fineTuning_weight')) if '.ckpt.index' in c]
+    files = [c for c in (os.listdir(finetuned_folder)) if '.ckpt.index' in c]
     ep = ['10', '25', '50', '75', '99']
     for f in sorted(files):
         epoch = f[10:12]
@@ -68,12 +68,12 @@ def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=Fals
             print(epoch)
             model_fineTuned_name = "fineTuned_{}".format(epoch)
             dist, watermark_succeeded = ExecuteVerification(dim_imgs).verificationOnAttackedImg(
-                model_attacked_folder="fineTuning_weight", model_attacked_name=model_fineTuned_name)
+                model_attacked_folder=finetuned_folder, model_attacked_name=model_fineTuned_name)
             print("{} | dist={:.5f} | WM succeded={} |".format(model_fineTuned_name, dist, watermark_succeeded))
             distances_out.append(dist)
             # Visualization of watermark information under model fine-tuning attacks
             model_visual_finetuned = WatermarkedVisualizerModel()
-            model_visual_finetuned.build_model(DnCNN_model_name=model_fineTuned_name, model_path='./fineTuning_weight/')
+            model_visual_finetuned.build_model(DnCNN_model_name=model_fineTuned_name, model_path=finetuned_folder)
             img_logo_fineTun = model_visual_finetuned.eval()
 
             if show_distance:
@@ -233,7 +233,9 @@ if __name__ == '__main__':
 
     if show_robustness_finetune:
         print('ROBUSTENESS ANALYSIS: FINE TUNING ATTACK')
-        fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True)
+        finetuned_folder = './fineTuning_weights_Img12'
+        #finetuned_folder = './fineTuning_weights_KTH'# Use this for Texture KTS dataset
+        fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True, finetuned_folder=finetuned_folder)
 
     if show_robustness_pruning:
         print('ROBUSTENESS ANALYSIS: PRUNING ATTACK')

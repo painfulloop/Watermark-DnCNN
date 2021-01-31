@@ -104,5 +104,5 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_',
 
 
 if __name__ == '__main__':
-    # fine tuning with original data and freezing all layers without the last
-    train(epochs=100)
+    train(train_data='./data/img_clean_pats.npy', epochs=100, fineTuning_path="./fineTuning_weights_Img12") # Fine tune with original datas
+    #train(train_data='./data/img_clean_KTH_TIPS.npy', epochs=100, fineTuning_path="./fineTuning_weights_KTH") # Fine tune with different datas

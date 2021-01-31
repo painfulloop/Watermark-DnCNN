@@ -1,4 +1,3 @@
-import argparse
 import glob, os
 import numpy as np
 from PIL import Image
@@ -9,18 +8,6 @@ import random
 
 # macro
 DATA_AUG_TIMES = 1  # transform a sample to a different sample for DATA_AUG_TIMES times
-
-parser = argparse.ArgumentParser(description='')
-parser.add_argument('--src_dir', dest='src_dir', default='./dataset/Train400', help='dir of data')
-parser.add_argument('--save_dir', dest='save_dir', default='./data', help='dir of patches')
-parser.add_argument('--patch_size', dest='pat_size', type=int, default=40, help='patch size')
-parser.add_argument('--stride', dest='stride', type=int, default=80, help='stride')
-parser.add_argument('--step', dest='step', type=int, default=40, help='step')
-parser.add_argument('--batch_size', dest='bat_size', type=int, default=100, help='batch size')
-# check output arguments
-parser.add_argument('--from_file', dest='from_file', default="./data/img_clean_pats.npy", help='get pic from file')
-parser.add_argument('--num_pic', dest='num_pic', type=int, default=10, help='number of pic to pick')
-args = parser.parse_args()
 
 def data_augmentation(image, mode):
     if mode == 0:
@@ -51,12 +38,11 @@ def data_augmentation(image, mode):
         image = np.rot90(image, k=3)
         return np.flipud(image)
 
-def generate_patches(isDebug=False):
+def generate_patches(bat_size=100, step=40, stride=80, pat_size=40, out_name="img_clean_pats", save_dir='./data', src_dir='./dataset/Train400'):
     global DATA_AUG_TIMES
     count = 0
-    filepaths = glob.glob(args.src_dir + '/*.png')
-    if isDebug:
-        filepaths = filepaths[:10]
+    filepaths = glob.glob(src_dir + '/*.png')
+    # filepaths = filepaths[:10] used on debug. But why?
     print ("number of training data %d" % len(filepaths))
 
     scales = [1, 0.9, 0.8, 0.7]
@@ -68,23 +54,23 @@ def generate_patches(isDebug=False):
             newsize = (int(img.size[0] * scales[s]), int(img.size[1] * scales[s]))
             img_s = img.resize(newsize, resample=PIL.Image.BICUBIC)  # do not change the original img
             im_h, im_w = img_s.size
-            for x in range(0 + args.step, (im_h - args.pat_size), args.stride):
-                for y in range(0 + args.step, (im_w - args.pat_size), args.stride):
+            for x in range(0 + step, (im_h - pat_size), stride):
+                for y in range(0 + step, (im_w - pat_size), stride):
                     count += 1
 
     origin_patch_num = count * DATA_AUG_TIMES
     print (origin_patch_num)
 
-    if origin_patch_num % args.bat_size != 0:
+    if origin_patch_num % bat_size != 0:
         print ("++++++++++++++++")
-        numPatches = (origin_patch_num // args.bat_size + 1) * args.bat_size
+        numPatches = (origin_patch_num // bat_size + 1) * bat_size
     else:
         numPatches = origin_patch_num
     print ("total patches = %d , batch size = %d, total batches = %d" % \
-            (numPatches, args.bat_size, numPatches // args.bat_size))
+            (numPatches, bat_size, numPatches // bat_size))
 
     # data matrix 4-D
-    inputs = np.zeros((numPatches, args.pat_size, args.pat_size, 1), dtype="uint8")
+    inputs = np.zeros((numPatches, pat_size, pat_size, 1), dtype="uint8")
 
     count = 0
     # generate patches
@@ -99,21 +85,35 @@ def generate_patches(isDebug=False):
 
             for j in range(DATA_AUG_TIMES):
                 im_h, im_w, _ = img_s.shape
-                for x in range(0 + args.step, im_h - args.pat_size, args.stride):
-                    for y in range(0 + args.step, im_w - args.pat_size, args.stride):
-                        inputs[count, :, :, :] = data_augmentation(img_s[x:x + args.pat_size, y:y + args.pat_size, :], \
-                                                                   random.randint(0, 7))
+                for x in range(0 + step, im_h - pat_size, stride):
+                    for y in range(0 + step, im_w - pat_size, stride):
+                        inputs[count, :, :, :] = data_augmentation(img_s[x:x + pat_size, y:y + pat_size, :], random.randint(0, 7))
                         count += 1
     # pad the batch
     if count < numPatches:
         to_pad = numPatches - count
         inputs[-to_pad:, :, :, :] = inputs[:to_pad, :, :, :]
 
-    if not os.path.exists(args.save_dir):
-        os.mkdir(args.save_dir)
-    np.save(os.path.join(args.save_dir, "img_clean_pats"), inputs)
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+    np.save(os.path.join(save_dir, out_name), inputs)
     print ("size of inputs tensor = " + str(inputs.shape))
 
 
 if __name__ == '__main__':
-    generate_patches()
+    # Generate numpy files for training and extra for finetuning
+    generate_patches(bat_size=100,
+                     step=40,
+                     stride=80,
+                     pat_size=40,
+                     out_name='img_clean_pats',
+                     save_dir='./data',
+                     src_dir='./dataset/Train400')
+
+    generate_patches(bat_size=100,
+                     step=40,
+                     stride=80,
+                     pat_size=40,
+                     out_name='img_clean_KTH_TIPS',
+                     save_dir='./data',
+                     src_dir='./dataset/Train_KTH_TIPS')
