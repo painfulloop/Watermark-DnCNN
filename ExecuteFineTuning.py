@@ -93,9 +93,10 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_',
                         dncnn_loss_res = sess.run(dncnn_loss, feed_dict={img_clean: batch_images, lr: learn_rate, training: False})
                     _ = sess.run(dncnn_opt, feed_dict={img_clean: batch_images, lr: learn_rate, training: True})
                     step += 1
+                print(f"epoch={epoch}, step={step}, dncnn_loss={dncnn_loss_res}")
                 if epoch % save_ckpt_each == 0:
                     DnCNN_saver.save(sess, os.path.join(fineTuning_path, DnCNN_model_name + str(epoch).zfill(2) + ".ckpt"))
-                print(f"epoch={epoch}, step={step}, dncnn_loss={dncnn_loss_res}" + ("SAVED" if epoch % save_ckpt_each == 0 else ""))
+                    print(f"++++ epoch {epoch} saved ++++")
 
 
 if __name__ == '__main__':
