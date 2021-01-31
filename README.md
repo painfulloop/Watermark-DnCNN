@@ -45,19 +45,33 @@ If it is runned, it will compile and run once the dncnn printing all layers and 
 
 All the scripts can be logically splitted into those categories:
 
-- __Keys Manager__: GeneratorTriggerVerificationImg
-- __Watermarking training__: DnCNN_model, Watermark_train
-- __Attack with finetune__: ExecuteFineTuning
-- __Attack with Pruning__: ExecutePruning
-- __Basic env test__: DnCNN_test
-- __Auxiliary visualizer__: AuxVisualizerModel, AuxVisualizer_train, WatermarkedTrainedModel
-- __Fast run scripts__: fastrun_test, fastrun_train
+- __Preprocessors__: *DnCNN_test.py* for basic environment test, *GeneratorTriggerVerificationImg.py* for trigger/verification keys, *Preprocess_dataset_for_dncnn.py* for numpy datasets creation
+- __Fast run scripts__: *fastrun_train.py* and *fastrun_test.py*
+- __Watermarking training__: *DnCNN_model.py* (model lib), *Watermark_train.py* for embedding watermark
+- __Auxiliary visualizer__: *AuxVisualizerModel.py* (model lib), *AuxVisualizer_train.py* for training 8 epochs
+- __Model storing library__:  *WatermarkedTrainedModel.py* (fast loading class to manage a model from checkpoint)
+- __Principles related scripts__: *ExecuteFineTuning.py* for Finetuning on 100 epochs (on Img12 or KTH dataset), *ExecutePruning.py* for pruning with k% weights, prunings.py (pruning utility lib)
+- __Paper results checking__: *PaperAnalysis.py*
 
-# Results after finetuning
+# Results
 
-- up-left: original output
-- up-right: watermarked output
-- down-left: fine-tuned output
-- down-right: watermarking result over fine-tuning (0.0040 <= 0.00607)
+All the results can be viewed in attached paper (TBD).
 
-![](finetuning_result_10ep.png)
+## Watermarking the dnn
+Finetuning all layers with trigger/verification key results in watermarking embedding:
+
+![](images_results/sign_per_cpk.png)
+
+## Robustness against Finetuning
+When finetuning last convolutional layer, the watermark is keep even for first 100 epochs.
+
+![](images_results/stack_out_fineTuning.png)
+
+## Robustness against Pruning
+When Pruning all convolutional layers, the watermark is keep even for k=35% of weights,
+
+![](images_results/pruning_results_row.png)
+
+\
+\
+Authors: [Fabian Greavu](https://github.com/fabian57fabian), [Scaramuzzino Giovanna](https://github.com/ScaramuzzinoGiovanna)

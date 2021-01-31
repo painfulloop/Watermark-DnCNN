@@ -2,6 +2,8 @@ import os
 import numpy as np
 import tensorflow as tf
 
+import utility
+
 
 def dncnn(input, is_training):
     with tf.variable_scope('block1'):
@@ -40,8 +42,9 @@ def transition(w):
 def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_', epochs=8,
           batch_size=128, learn_rate=0.0001, sigma=25, org_model_path='./overwriting/',
           fineTuning_path='./fineTuning_weight/'):
+    utility.create_folder(fineTuning_path)
     spec_size = [1, 40, 40, 1]
-
+    save_ckpt_each = 5
     with tf.Graph().as_default():
         lr = tf.placeholder(tf.float32, shape=[], name='learning_rate')
         training = tf.placeholder(tf.bool, name='is_training')
@@ -77,32 +80,24 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_',
                 print('last ckp', full_path)
                 DnCNN_saver.restore(sess, full_path)
                 print("Loading " + os.path.basename(full_path) + " to the model")
-
             else:
                 print("DnCNN weight must be exist")
                 assert ckpt != None, 'weights not exist'
 
             step = 0
-            for epoch in range(0, epochs):
+            for epoch in range(1, epochs+1):
                 np.random.shuffle(data_total)
                 for batch_id in range(0, numBatch):
-
                     batch_images = data_total[batch_id * batch_size:(batch_id + 1) * batch_size, :, :, :]
-
                     if batch_id % 100 == 0:
-                        dncnn_lost = sess.run(dncnn_loss, feed_dict={img_clean: batch_images, lr: learn_rate,
-                                                                     training: False})
-
-                        print("step = %d, dncnn_loss = %f" % (step, dncnn_lost))
-
-                    _ = sess.run(dncnn_opt, feed_dict={img_clean: batch_images, lr: learn_rate,
-                                                       training: True})
+                        dncnn_loss_res = sess.run(dncnn_loss, feed_dict={img_clean: batch_images, lr: learn_rate, training: False})
+                    _ = sess.run(dncnn_opt, feed_dict={img_clean: batch_images, lr: learn_rate, training: True})
                     step += 1
-
-                DnCNN_saver.save(sess, fineTuning_path + DnCNN_model_name + str(epoch + 1).zfill(2) + ".ckpt")
-                print("+++++ epoch " + str(epoch + 1) + " is saved successfully +++++")
+                if epoch % save_ckpt_each == 0:
+                    DnCNN_saver.save(sess, os.path.join(fineTuning_path, DnCNN_model_name + str(epoch).zfill(2) + ".ckpt"))
+                print(f"epoch={epoch}, step={step}, dncnn_loss={dncnn_loss_res}"+"SAVED" if epoch % save_ckpt_each == 0 else "" )
 
 
 if __name__ == '__main__':
-    train(train_data='./data/img_clean_pats.npy', epochs=100, fineTuning_path="./fineTuning_weights_Img12") # Fine tune with original datas
-    #train(train_data='./data/img_clean_KTH_TIPS.npy', epochs=100, fineTuning_path="./fineTuning_weights_KTH") # Fine tune with different datas
+    train(train_data='./data/img_clean_pats.npy', epochs=100, fineTuning_path="fineTuning_weights_Img12") # Fine tune with original datas
+    #train(train_data='./data/img_clean_KTH_TIPS.npy', epochs=100, fineTuning_path="fineTuning_weights_KTH") # Fine tune with different datas

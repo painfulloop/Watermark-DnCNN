@@ -61,7 +61,7 @@ def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=Fals
     distances_out = [0]
     images_out = [img_logo_watermarked]
     files = [c for c in (os.listdir(finetuned_folder)) if '.ckpt.index' in c]
-    ep = ['10', '25', '50', '75', '99']
+    ep = ['10', '25', '50', '75', '100']
     for f in sorted(files):
         epoch = f[10:12]
         if epoch in ep:
@@ -233,8 +233,8 @@ if __name__ == '__main__':
 
     if show_robustness_finetune:
         print('ROBUSTENESS ANALYSIS: FINE TUNING ATTACK')
-        finetuned_folder = './fineTuning_weights_Img12'
-        #finetuned_folder = './fineTuning_weights_KTH'# Use this for Texture KTS dataset
+        #finetuned_folder = './fineTuning_weights_Img12'
+        finetuned_folder = './fineTuning_weights_KTH'# Use this for Texture KTS dataset
         fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True, finetuned_folder=finetuned_folder)
 
     if show_robustness_pruning:
