@@ -29,17 +29,18 @@ In order to test the repo, execute:
 
 0. __GeneratorTriggerVerificationImg.py__ that will create keys folder with Trigger and Verification images
 1. __Preprocess_dataset_for_dncnn.py__ that will create all needed datas
-2. __Watermark_train__ in order to train dncnn for 6 epochs
-4. __AuxVisualizer_train__ in order to train Prior model for 2 epochs
-5. __WatermarkedVisualizerModel__ in order to show results of 2 epochs retraining on watermarked image "Mr Vision"
-6. __PaperAnalysis__ reproduces the uniqueness tests and robustness tests to model Fine-Tuning and Pruning
+2. __Watermark_train__ in order to train dncnn for 8 epochs
+3. __AuxVisualizer_train__ in order to train Prior model for 8 epochs
+4. __WatermarkedVisualizerModel__ in order to show results of 8 epochs retraining on watermarked image "Mr Vision"
+5. __PaperAnalysis__ reproduces the uniqueness tests, fidelity test and robustness tests to model Fine-Tuning and
+   Pruning
 
-## Scripts details
+** __note__: the scripts above, in 0,1,2,3 can be run directly via the *fastrun_train.py*
 
 Following python files are only used as import modules for other scripts:
 
-- __DnCNN_model.py__: contains all functions needed to create the dncnn model (also with loss and optimizer). 
-If it is runned, it will compile and run once the dncnn printing all layers and testing if allright
+- __DnCNN_model.py__: contains all functions needed to create the dncnn model (also with loss and optimizer). If it is
+  runned, it will compile and run once the dncnn printing all layers and testing if allright
 - __AuxVisualizerModel.py__: contains all functions needed to create Deep Prior model (also with loss and optimizer)
 - __utility.py__: contains utility functions for file store and other utilities
 
