@@ -200,11 +200,11 @@ def fidelity_analysis(watermarked_model_path, dataset='./dataset/test/Texture12/
 
 
 if __name__ == '__main__':
-    show_uniqueness = False
+    show_uniqueness = True
     show_robustness_finetune = True
-    show_robustness_pruning = False
+    show_robustness_pruning = True
     show_watermarked_unwatermarked = False
-    show_fidelity = False
+    show_fidelity = True
 
     model_path = './overwriting/'
     dip_model_path = './combine_weight/'
