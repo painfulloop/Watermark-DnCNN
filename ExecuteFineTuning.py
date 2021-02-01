@@ -117,3 +117,6 @@ if __name__ == '__main__':
 
         train(train_data='./data/img_clean_KTH_TIPS.npy', epochs=100,
               fineTuning_path="fineTuning_weights_KTH")
+    else:
+        print(
+            'You have to choose a correct dataset for a vabiable "dataset": ./data/img_clean_pats.npy or ./data/img_clean_KTH_TIPS.npy')
