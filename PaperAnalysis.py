@@ -47,10 +47,11 @@ def uniqueness_analysis(model, trigger_imgs, verification_imgs, n_keys, dim_imgs
         print('all keys are watermark_succeeded = ', all_succeeded)
 
 
-def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=False, save_images=False, finetuned_folder='./fineTuning_weights_Img12'):
+def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=False, save_images=False,
+                                finetuned_folder='./fineTuning_weights_Img12', dataset_name='originalDataset'):
     # eval finetuning model with original data- calculate psnr and plot image. Choose epoch you need
     if save_images:
-        result_path = utility.create_folder('results/fineTuning')
+        result_path = utility.create_folder('results/fineTuning_' + dataset_name)
     model_visual_unwatermarked = WatermarkedVisualizerModel()
     model_visual_unwatermarked.build_model(DnCNN_model_name='model_weight_45', model_path='./DnCNN_weight/')
 
@@ -88,9 +89,10 @@ def fine_tuning_attack_analysis(dim_imgs, show_distance=True, show_Separate=Fals
     for i in range(1, len(images_out)):
         if not show_distance:
             psnr_ = utility.psnr(images_out[i], test_img)
-            print('psnr epoch ' + ep[i-1] + ': ' + str(round(psnr_, 2)))
+            print('psnr epoch ' + ep[i - 1] + ': ' + str(round(psnr_, 2)))
     if not show_Separate:
-        utility.show_image(utility.stack_images_square(images_out), 'Finetuning epochs 0 '+' '.join(ep))
+        utility.show_image(utility.stack_images_square(images_out),
+                           'Finetuning epochs 0 ' + ' '.join(ep) + ' using ' + dataset_name)
 
 
 def pruning_attack_analysis(dim_imgs, pruning_weights_path="./pruning_weights/", show_distance=True,
@@ -202,6 +204,7 @@ def fidelity_analysis(watermarked_model_path, dataset='./dataset/test/Texture12/
 if __name__ == '__main__':
     show_uniqueness = True
     show_robustness_finetune = True
+    show_robustness_finetune_kts_dataset = True
     show_robustness_pruning = True
     show_watermarked_unwatermarked = False
     show_fidelity = True
@@ -230,10 +233,19 @@ if __name__ == '__main__':
         visualize_uniqueness(model_path, dip_model_path, trigger_imgs[:50], out_copyrightImg_path, test_img)
 
     if show_robustness_finetune:
-        print('ROBUSTENESS ANALYSIS: FINE TUNING ATTACK')
-        #finetuned_folder = './fineTuning_weights_Img12'
-        finetuned_folder = './fineTuning_weights_KTH'# Use this for Texture KTS dataset
-        fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True, finetuned_folder=finetuned_folder)
+        print('ROBUSTENESS ANALYSIS: FINE TUNING ATTACK with original dataset')
+        finetuned_folder = './fineTuning_weights_Img12'
+        fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True,
+                                    finetuned_folder=finetuned_folder, dataset_name='originalDataset')
+
+    if show_robustness_finetune_kts_dataset:
+        print('ROBUSTENESS ANALYSIS: FINE TUNING ATTACK with Texture KTS dataset')
+        finetuned_folder = './fineTuning_weights_KTH'  # Use this for Texture KTS dataset
+        if not (os.path.isfile(finetuned_folder)):
+            print('You must first train ExceuteFineTuning.py by choosing the dataset: ./data/img_clean_KTH_TIPS.npy')
+        else:
+            fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True,
+                                        finetuned_folder=finetuned_folder, dataset_name='KTSDataset')
 
     if show_robustness_pruning:
         print('ROBUSTENESS ANALYSIS: PRUNING ATTACK')
