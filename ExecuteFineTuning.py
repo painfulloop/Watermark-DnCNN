@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import tensorflow as tf
+import Preprocess_dataset_for_dncnn
 
 import utility
 
@@ -85,20 +86,34 @@ def train(train_data='./data/img_clean_pats.npy', DnCNN_model_name='fineTuned_',
                 assert ckpt != None, 'weights not exist'
 
             step = 0
-            for epoch in range(1, epochs+1):
+            for epoch in range(1, epochs + 1):
                 np.random.shuffle(data_total)
                 for batch_id in range(0, numBatch):
                     batch_images = data_total[batch_id * batch_size:(batch_id + 1) * batch_size, :, :, :]
                     if batch_id % 100 == 0:
-                        dncnn_loss_res = sess.run(dncnn_loss, feed_dict={img_clean: batch_images, lr: learn_rate, training: False})
+                        dncnn_loss_res = sess.run(dncnn_loss,
+                                                  feed_dict={img_clean: batch_images, lr: learn_rate, training: False})
                     _ = sess.run(dncnn_opt, feed_dict={img_clean: batch_images, lr: learn_rate, training: True})
                     step += 1
                 print(f"epoch={epoch}, step={step}, dncnn_loss={dncnn_loss_res}")
                 if epoch % save_ckpt_each == 0:
-                    DnCNN_saver.save(sess, os.path.join(fineTuning_path, DnCNN_model_name + str(epoch).zfill(2) + ".ckpt"))
+                    DnCNN_saver.save(sess,
+                                     os.path.join(fineTuning_path, DnCNN_model_name + str(epoch).zfill(2) + ".ckpt"))
                     print(f"++++ epoch {epoch} saved ++++")
 
 
 if __name__ == '__main__':
-    train(train_data='./data/img_clean_pats.npy', epochs=100, fineTuning_path="fineTuning_weights_Img12") # Fine tune with original datas
-    #train(train_data='./data/img_clean_KTH_TIPS.npy', epochs=100, fineTuning_path="fineTuning_weights_KTH") # Fine tune with different datas
+    dataset = './data/img_clean_pats.npy'  # Fine tune with original datas
+    # dataset = './data/img_clean_KTH_TIPS.npy' # Fine tune with different datas
+
+    if dataset == './data/img_clean_pats.npy':
+        train(train_data='./data/img_clean_pats.npy', epochs=100,
+              fineTuning_path="fineTuning_weights_Img12")  # Fine tune with original datas
+    elif dataset == './data/img_clean_KTH_TIPS.npy':
+        if not (os.path.isfile(dataset)):
+            Preprocess_dataset_for_dncnn.generate_patches(bat_size=100, step=40, stride=80, pat_size=40,
+                                                          out_name='img_clean_KTH_TIPS', save_dir='./data',
+                                                          src_dir='./dataset/Train_KTH_TIPS')
+
+        train(train_data='./data/img_clean_KTH_TIPS.npy', epochs=100,
+              fineTuning_path="fineTuning_weights_KTH")
