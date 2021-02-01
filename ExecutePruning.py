@@ -91,6 +91,6 @@ if __name__ == '__main__':
     for value_k in np.arange(0.05, 0.61, 0.05):
         k = round(float(value_k), 2)
         load_and_prune_model(org_model_path="overwriting", model_name=utility.get_last_model("overwriting") + ".ckpt",
-                             out_pruned_path="pruning_weights_gio2", k=k)
+                             k=k)
         print("Pruned {}".format(k))
     # prune_model(org_model_path=os.path.join("overwriting", utility.get_last_model("overwriting")), out_pruned_path="pruning_weights/pruned_float16")
