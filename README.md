@@ -27,15 +27,15 @@ Below scripts saves training checkpoints in various folders. Those directories a
 
 In order to test the repo, execute:
 
-0. __GeneratorTriggerVerificationImg.py__ that will create keys folder with Trigger and Verification images
+1. __GeneratorTriggerVerificationImg.py__ that will create keys folder with Trigger and Verification images
 1. __Preprocess_dataset_for_dncnn.py__ that will create all needed datas
-2. __Watermark_train__ in order to train dncnn for 8 epochs
-3. __AuxVisualizer_train__ in order to train Prior model for 8 epochs
-4. __WatermarkedVisualizerModel__ in order to show results of 8 epochs retraining on watermarked image "Mr Vision"
-5. __PaperAnalysis__ reproduces the uniqueness tests, fidelity test and robustness tests to model Fine-Tuning and
-   Pruning
+1. __Watermark_train.py__ in order to train dncnn for 8 epochs (ckpt saved in overwriting)
+1. __AuxVisualizer_train.py__ in order to train Prior model for 8 epochs (ckpt saved in combine_weight)
+1. __ExecuteFineTuning.py__ in order to finetune watermarked model (ckpt saved in fineTuning_weight)
+1. __ExecutePruning.py__ in order to prune watermarked model (ckpt saved in pruning_weights)
+1. __PaperAnalysis__ reproduces the uniqueness, fidelity and robustness tests and shows interesting plots
 
-** __note__: the scripts above, in 0,1,2,3 can be run directly via the *fastrun_train.py*
+** __note__: the scripts above, in 1, 2, 3, 4 can be run directly via the *fastrun_train.py*
 
 Following python files are only used as import modules for other scripts:
 
@@ -43,8 +43,9 @@ Following python files are only used as import modules for other scripts:
   runned, it will compile and run once the dncnn printing all layers and testing if allright
 - __AuxVisualizerModel.py__: contains all functions needed to create Deep Prior model (also with loss and optimizer)
 - __utility.py__: contains utility functions for file store and other utilities
-
+- __WatermarkedTrainedModel.py__ nad __WatermarkedVisualizerModel__: easy to use wrappers for needed modules for Paper tests
 All the scripts can be logically splitted into those categories:
+- __prunings.py__: contains utility functions for weight and unit pruning on tensorflow Variable
 
 - __Preprocessors__: *DnCNN_test.py* for basic environment test, *GeneratorTriggerVerificationImg.py* for trigger/verification keys, *Preprocess_dataset_for_dncnn.py* for numpy datasets creation
 - __Fast run scripts__: *fastrun_train.py* and *fastrun_test.py*
