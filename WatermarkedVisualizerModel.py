@@ -74,8 +74,9 @@ class WatermarkedVisualizerModel(object):
         self.ldr = None
         self.dncnn_s_out = None
 
-    def build_model(self, model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45',
-                    DIP_model_path='./combine_weight/', DIP_model_name='Black_DIP_sign_weight_8'):
+    def build_model(self, model_path='./DnCNN_weight/', DnCNN_model_name='model_weight_45'):
+        DIP_model_path = './combine_weight/'
+        DIP_model_name = 'Black_DIP_sign_weight_8'
         if self.loaded:
             self.session.close()
             del self.session
@@ -144,8 +145,7 @@ if __name__ == '__main__':
     dip_model_path = './combine_weight/'
 
     model = WatermarkedVisualizerModel()
-    model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
-                      DIP_model_path=dip_model_path, DIP_model_name=utility.get_last_model(dip_model_path))
+    model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path))
 
     img = model.eval()
     cv2.imwrite(out_copyrightImg_path + '/copyrightImg.png', img)
