@@ -235,13 +235,16 @@ if __name__ == '__main__':
     if show_robustness_finetune:
         print('ROBUSTENESS ANALYSIS: FINE TUNING ATTACK with original dataset')
         finetuned_folder = './fineTuning_weights_Img12'
-        fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True,
+        if not (os.path.isdir(finetuned_folder)):
+            print('You must first train ExceuteFineTuning.py by choosing the dataset: ./data/img_clean_KTH_TIPS.npy')
+        else:
+            fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True,
                                     finetuned_folder=finetuned_folder, dataset_name='originalDataset')
 
     if show_robustness_finetune_kts_dataset:
         print('ROBUSTENESS ANALYSIS: FINE TUNING ATTACK with Texture KTS dataset')
         finetuned_folder = './fineTuning_weights_KTH'  # Use this for Texture KTS dataset
-        if not (os.path.isfile(finetuned_folder)):
+        if not (os.path.isdir(finetuned_folder)):
             print('You must first train ExceuteFineTuning.py by choosing the dataset: ./data/img_clean_KTH_TIPS.npy')
         else:
             fine_tuning_attack_analysis(dim_imgs, show_distance=False, show_Separate=False, save_images=True,
