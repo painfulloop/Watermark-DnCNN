@@ -3,6 +3,7 @@ import os
 import cv2
 import numpy as np
 import time
+import json
 
 
 def ResizeWithAspectRatio(image, width=None, height=None, inter=cv2.INTER_AREA):
@@ -21,7 +22,7 @@ def ResizeWithAspectRatio(image, width=None, height=None, inter=cv2.INTER_AREA):
     return cv2.resize(image, dim, interpolation=inter)
 
 
-def show_image(img, title="", wait=True):
+def show_image(img, title="", wait=False):
     if img.shape[0] > 1000:
         img = ResizeWithAspectRatio(img, height=1000)
     cv2.imshow(title, img)
@@ -109,3 +110,8 @@ def psnr(img1, img2):
     PSNR = 20 * np.log10(MAX / sqrt_MSE)
 
     return PSNR
+
+
+def save_json_results(datas_json:dict, file_path:str):
+    with open(file_path, 'w') as out_file:
+        json.dump(datas_json, out_file)

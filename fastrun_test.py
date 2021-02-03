@@ -22,8 +22,7 @@ def eval_all_ckpts(model_path, dip_model_path, img_test):
 
     for dip_model in ckpts:
         model = WatermarkedVisualizerModel()
-        model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
-                          DIP_model_path=dip_model_path, DIP_model_name=dip_model)
+        model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path))
         eval_img = model.eval()
         eval_imgs.append(eval_img)
         cv2.imwrite(out_copyrightImg_path + '/' + dip_model + '_copyright.png', eval_img)
@@ -53,7 +52,6 @@ if __name__ == '__main__':
     # eval_all_ckpts(model_path, dip_model_path, test_img)
 
     model = WatermarkedVisualizerModel()
-    model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path),
-                      DIP_model_path=dip_model_path, DIP_model_name=utility.get_last_model(dip_model_path))
+    model.build_model(model_path=model_path, DnCNN_model_name=utility.get_last_model(model_path))
 
     eval_ckpt_and_compare(model)
