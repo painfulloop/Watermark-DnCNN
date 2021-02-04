@@ -14,7 +14,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 def visualize_uniqueness(model_path, dip_model_path, false_trigger_imgs, test_img, save_images=True, show_results=True):
     # dimostra che date in ingresso delle trigger image diverse dall'originale non produce il watermarker
-    out_copyrightImg_path = 'results/out_copyrightImg/'
+    out_copyrightImg_path = 'results/uniqueness/'
     if save_images:
         utility.create_folder(out_copyrightImg_path)
     not_copyright_imgs = []
@@ -36,7 +36,7 @@ def visualize_uniqueness(model_path, dip_model_path, false_trigger_imgs, test_im
 
 
 def uniqueness_analysis(model, trigger_imgs, verification_imgs, n_keys, dim_imgs, save_images=True):
-    out_copyrightImg_path = 'results/out_copyrightImg/'
+    out_copyrightImg_path = 'results/uniqueness/'
     if save_images:
         utility.create_folder(out_copyrightImg_path)
     out_datas = []
@@ -158,15 +158,15 @@ def unwatermarked_vs_watermarked(save_images=True, show_results=True):
     model_visual_unwatermarked = WatermarkedVisualizerModel()
     model_visual_unwatermarked.build_model(DnCNN_model_name='model_weight_45', model_path='./DnCNN_weight/')
     img_logo_unwatermarked = model_visual_unwatermarked.eval()
-    dist_w, watermark_succeeded_w, psnr_w = WMVerificationManager(dim_imgs).calculate_dist_ver_psnr(
+    dist, watermark_succeeded, psnr = WMVerificationManager(dim_imgs).calculate_dist_ver_psnr(
         model_attacked_folder='./DnCNN_weight/', model_attacked_name='model_weight_45')
-    print("unwatermarked model | dist={:.5f} | WM succeded={} | psnr={:.2f}".format(dist_w, watermark_succeeded_w, psnr_w))
+    print("unwatermarked model | dist={:.5f} | WM succeded={} | psnr={:.2f}".format(dist, watermark_succeeded, psnr))
     model_visual_watermarked = WatermarkedVisualizerModel()
     model_visual_watermarked.build_model(DnCNN_model_name=utility.get_last_model('./overwriting/'),
                                          model_path='./overwriting/')
-    dist, watermark_succeeded, psnr = WMVerificationManager(dim_imgs).calculate_dist_ver_psnr(
+    dist_w, watermark_succeeded_w, psnr_w = WMVerificationManager(dim_imgs).calculate_dist_ver_psnr(
         model_attacked_folder='./overwriting/', model_attacked_name=utility.get_last_model('./overwriting/'))
-    print("watermarked model | dist={:.5f} | WM succeded={} | psnr={:.2f}".format(dist, watermark_succeeded, psnr))
+    print("watermarked model | dist={:.5f} | WM succeded={} | psnr={:.2f}".format(dist_w, watermark_succeeded_w, psnr_w))
     img_logo_watermarked = model_visual_watermarked.eval()
     images_out = [img_logo_unwatermarked, img_logo_watermarked]
     test_img = cv2.resize(cv2.imread('test_img/sign.png', 0), images_out[1].shape, interpolation=cv2.INTER_AREA)

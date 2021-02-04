@@ -114,4 +114,4 @@ def psnr(img1, img2):
 
 def save_json_results(datas_json:dict, file_path:str):
     with open(file_path, 'w') as out_file:
-        json.dump(datas_json, out_file)
+        json.dump(datas_json, out_file, indent=4)

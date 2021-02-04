@@ -1,6 +1,4 @@
 # Watermark-DnCNN
-The code is being reorganized and updated.
-
 ## Intro
 
 This repo refers to Watermarking Dnns paper you can find [here](https://ieeexplore.ieee.org/document/9093125).
@@ -37,6 +35,8 @@ In order to test the repo, execute:
 
 ** __note__: the scripts above, in 1, 2, 3, 4 can be run directly via the *fastrun_train.py*
 
+# Scripts description
+
 Following python files are only used as import modules for other scripts:
 
 - __DnCNN_model.py__: contains all functions needed to create the dncnn model (also with loss and optimizer). If it is
@@ -70,7 +70,7 @@ When finetuning last convolutional layer, the watermark is keep even for first 1
 ![](images_results/stack_out_fineTuning.png)
 
 ## Robustness against Pruning
-When Pruning all convolutional layers, the watermark is keep even for k=35% of weights,
+When Pruning all convolutional layers, the watermark is kept until k=60%.
 
 ![](images_results/pruning_results_row.png)
 
