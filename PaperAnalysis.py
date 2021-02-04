@@ -8,6 +8,7 @@ import numpy as np
 import utility
 import warnings
 import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 warnings.filterwarnings("ignore")
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -169,10 +170,6 @@ def unwatermarked_vs_watermarked(save_images=True, show_results=True):
     print("watermarked model | dist={:.5f} | WM succeded={} | psnr={:.2f}".format(dist_w, watermark_succeeded_w, psnr_w))
     img_logo_watermarked = model_visual_watermarked.eval()
     images_out = [img_logo_unwatermarked, img_logo_watermarked]
-    test_img = cv2.resize(cv2.imread('test_img/sign.png', 0), images_out[1].shape, interpolation=cv2.INTER_AREA)
-    for i in range(len(images_out)):
-        psnr_ = utility.psnr(images_out[i], test_img)
-        print('psnr ' + model_name[i] + ' : ' + str(round(psnr_, 2)))
     if save_images:
         cv2.imwrite(result_path + 'Un-Watermarked.png', utility.stack_images_row(images_out))
         datas_all = {"watermarked": {"distance": dist_w, "success": bool(watermark_succeeded_w), "psnr": psnr_w},
@@ -183,7 +180,6 @@ def unwatermarked_vs_watermarked(save_images=True, show_results=True):
 
 
 def fidelity_analysis(watermarked_model_path, dataset='./dataset/test/Texture12/', save_images=True):
-    # print('gap < 0.05 dB is acceptable')
     result_path = 'results/fidelity/'
     if save_images:
         utility.create_folder(result_path)
@@ -214,15 +210,15 @@ def fidelity_analysis(watermarked_model_path, dataset='./dataset/test/Texture12/
     print('Watermarked model | avg psnr: ', avg_psnr_w)
     if save_images:
         datas_all = [{"image": i, "psnr": p} for i, p in zip(test_images, psnr_)]
-        utility.save_json_results( {"psnr_avg": avg_psnr_w, "psnr_all": datas_all}, result_path + "datas_fidelity.json")
+        utility.save_json_results({"psnr_avg": avg_psnr_w, "psnr_all": datas_all}, result_path + "datas_fidelity.json")
 
 
 if __name__ == '__main__':
     show_uniqueness = False
-    show_robustness_finetune = False
+    show_robustness_finetune = True
     show_robustness_finetune_kts_dataset = False
     show_robustness_pruning = False
-    show_watermarked_unwatermarked = True
+    show_watermarked_unwatermarked = False
     show_fidelity = False
 
     model_path = './overwriting/'
