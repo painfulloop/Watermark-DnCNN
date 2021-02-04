@@ -22,7 +22,7 @@ def ResizeWithAspectRatio(image, width=None, height=None, inter=cv2.INTER_AREA):
     return cv2.resize(image, dim, interpolation=inter)
 
 
-def show_image(img, title="", wait=False):
+def show_image(img, title="", wait=True):
     if img.shape[0] > 1000:
         img = ResizeWithAspectRatio(img, height=1000)
     cv2.imshow(title, img)

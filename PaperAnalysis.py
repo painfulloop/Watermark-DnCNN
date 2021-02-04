@@ -275,5 +275,3 @@ if __name__ == '__main__':
     if show_fidelity:
         print('FIDELITY on dataset: ', name_dataset)
         fidelity_analysis(model_path, dataset=dataset)
-
-    x = input("Press [ENTER] to exit")
