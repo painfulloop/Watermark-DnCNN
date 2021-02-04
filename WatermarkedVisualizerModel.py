@@ -64,6 +64,10 @@ def transition(w):
 
 
 class WatermarkedVisualizerModel(object):
+    '''
+    Easy to use class that builds a model (and the Auxiliary visualizer) based on given checkpoint and is ready to eval input images.
+    Given output have to be a watermark sign.
+    '''
     def __init__(self):
         self.loaded = False
         self.session: tf.Session = None

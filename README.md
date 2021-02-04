@@ -55,6 +55,20 @@ All the scripts can be logically splitted into those categories:
 - __Principles related scripts__: *ExecuteFineTuning.py* for Finetuning on 100 epochs (on Img12 or KTH dataset), *ExecutePruning.py* for pruning with k% weights, prunings.py (pruning utility lib)
 - __Paper results checking__: *PaperAnalysis.py*
 
+# Approaces tested thru PaperAnalysis
+Script **PaperAnalysis.py** tests given dncnn model on:
+
+- Uniqueness
+- Robustness (finetuning)
+- Robustness (pruning)
+- Watermarking vs Original model output
+- Fidelity
+
+Just set boolean **True** on interesting variables in PaperAnalysis main's method and run it.
+When show_images parameter (from various methods) is set to True, remember to press space on image to go further (opencv imshow method manages it that way).
+Results are saved in **results** subfolders with images and json datas.
+Below are some visual simple results tested.
+
 # Results
 
 All the results can be viewed in attached paper (TBD).

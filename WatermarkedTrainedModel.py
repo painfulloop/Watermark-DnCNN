@@ -84,6 +84,9 @@ def post_process(img):
 
 
 class WatermarkedTrainedModel(object):
+    '''
+    Easy to use class that builds a model based on given checkpoint and is ready to eval input images.
+    '''
     def __init__(self):
         self.loaded = False
         self.session: tf.Session = None

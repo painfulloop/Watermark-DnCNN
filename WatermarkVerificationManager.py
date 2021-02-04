@@ -6,6 +6,9 @@ import cv2
 
 
 class WMVerificationManager:
+    '''
+    Keeps methods to calculate watermarking distance, psnr, success on marked models.
+    '''
     def __init__(self, dim_imgs):
         self.dim = dim_imgs
         self.test_filename = './dataset/test/Set12/01.png'

@@ -214,6 +214,7 @@ def fidelity_analysis(watermarked_model_path, dataset='./dataset/test/Texture12/
 
 
 if __name__ == '__main__':
+    '''Change following variables in order to execute tests on watermarked models.'''
     show_uniqueness = False
     show_robustness_finetune = True
     show_robustness_finetune_kts_dataset = False
