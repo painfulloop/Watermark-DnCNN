@@ -92,4 +92,4 @@ When Pruning all convolutional layers, the watermark is kept until k=60%.
 \
 **Original code**: [painfulloop](https://github.com/painfulloop) (Main paper author)
 
-**Paper results implementation contributors**: [Fabian Greavu](https://github.com/fabian57fabian) and [Scaramuzzino Giovanna](https://github.com/ScaramuzzinoGiovanna) (scripts and results added within *Image Processing* course project at *Unifi* under *Alessandro Piva*'s supervision)
+**Paper results implementation contributors**: [Fabian Greavu](https://github.com/fabian57fabian) and [Scaramuzzino Giovanna](https://github.com/ScaramuzzinoGiovanna) (scripts and results added within *Image Processing & Security* course project at the *Department of Information Engineering* of the *University of Florence* under Prof. *Alessandro Piva*'s supervision)
